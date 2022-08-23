@@ -1,0 +1,167 @@
+
+/* The authors of haokkoz release this file under Apache v2.0 license terms. */
+
+import com.github.jk1.license.render.*
+
+plugins {
+	id 'com.github.jk1.dependency-license-report' version '2.0'
+	id 'java'
+	id 'maven-publish'
+	id 'distribution' // ¶ for zip file with readme
+	id 'application' // ¶ for run task
+}
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+}
+
+dependencies {
+	compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+ grpc
+
+	runtimeOnly 'io.grpc:grpc-netty-shaded:1.48.1'
+
+	implementation 'io.grpc:grpc-protobuf:1.48.1'
+	implementation 'io.grpc:grpc-stub:1.48.1'
+	implementation 'com.auto-traffic-control:auto-traffic-control:0.3.2'
+	// implementation 'org.slf4j:slf4j-api:1.7.25'
+
+	testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+}
+
+group = 'ws.nzen.game.sim.hao'
+version = '0.0-alpha-0.0'
+description = 'Communicates with jndo Auto-Traffic-Control'
+
+compileJava {
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
+}
+
+sourceCompatibility = '1.8'
+
+licenseReport {
+	renderers = [ new JsonReportRenderer('dependency-libraries.json', false ) ]
+}
+
+java {
+	withSourcesJar()
+}
+
+jar {
+	manifest {
+		attributes(
+			'Main-Class' : 'ws.nzen.game.sim.hao.Haokkoz',
+			'Automatic-Module-Name' : 'ws.nzen.game.sim.hao.haokkoz',
+			// 'Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join( ' ' )
+		)
+	}
+	from "LICENSE" // ¶ embed this in the jar itself
+}
+
+/* // ¶ for embedding dependencides directly in jar // FIX use shade plugin, instead
+task uberJar(type: Jar) {
+	archiveClassifier = 'uber'
+
+	from sourceSets.main.output
+
+	dependsOn configurations.runtimeClasspath
+	from {
+		configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree( it ) }
+	}
+}
+*/
+
+run {
+	mainClassName = 'ws.nzen.game.sim.hao.HaoStub'
+}
+
+task run_( type: JavaExec ) {
+	group = 'application'
+	classpath = sourceSets.main.runtimeClasspath
+	main = 'ws.nzen.game.sim.hao.HaoStub'
+	standardInput = System.in
+}
+
+
+publishing {
+	publications {
+		maven( MavenPublication ) {
+			from( components.java )
+			pom {
+				name = project.name
+				inceptionYear = '2022'
+				url = ''
+				packaging = 'jar'
+				licenses {
+					license {
+						name = 'Apache v2.0'
+						url = 'https://www.apache.org/licenses/LICENSE-2.0'
+					}
+				}
+				developers {
+					developer {
+						id = 'Nzen'
+						name = 'Nicholas Prado'
+						email = 'nmprado@nzen.ws'
+					}
+				}
+				/*
+				scm {
+					connection = ''
+					developerConnection = ''
+					url = ''
+				}
+				*/
+			}
+			artifact distZip
+		}
+	}
+}
+
+distributions {
+	main {
+		distributionBaseName = 'haokkoz'
+		contents {
+			from 'LICENSE',
+					'readme.adoc',
+					'src/main/assets/cookpad-license-report-flat.json',
+					'changelog.adoc'
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

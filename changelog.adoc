@@ -1,0 +1,23 @@
+
+= haokkoz Changelog
+
+////
+the authors of Haokkoz release this file under the terms of the Apache license v2.0
+////
+
+== Unreleased
+
+=== Added
+
+* 
+
+=== Changed
+
+* 
+
+=== Removed
+
+* 
+
+== [0.0] - 22-0-
+

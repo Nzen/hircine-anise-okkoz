@@ -1,0 +1,13 @@
+
+haokkoz
+
+Copyright authors of Haokkoz, released under terms of the Apache v2.0 license (or the latest version), as reproduced in apache-v2.0.txt in this repository, and as contemporarily accessible at https://www.apache.org/licenses/LICENSE-2.0 . The Apache license is copyright the Apache Foundation.
+
+haokkoz relies on
+* grpc-java, which the gRPC authors released under Apache v2.0 license terms
+* auto-traffic-control, which its authors released under Apache v2.0 (and MIT) license terms
+
+////
+* _, which is copyright _ released under _ license terms.
+////
+
