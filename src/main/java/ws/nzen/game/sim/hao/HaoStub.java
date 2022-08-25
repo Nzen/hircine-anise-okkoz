@@ -1,4 +1,8 @@
-package com.example;
+
+/* © authors of Hircine Anise Okkoz, who release this file
+ * under the terms of the Apache license v2.0 */
+
+package ws.nzen.game.sim.hao;
 
 import atc.v1.Atc.GetVersionRequest;
 import atc.v1.Atc.GetVersionResponse;

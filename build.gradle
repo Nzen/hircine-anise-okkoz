@@ -6,8 +6,10 @@ import com.github.jk1.license.render.*
 plugins {
 	id 'com.github.jk1.dependency-license-report' version '2.0'
 	id 'java'
+	// id 'com.github.johnrengelman.shadow' version '7.1.2'
+	id 'signing'
 	id 'maven-publish'
-	id 'distribution' // ¶ for zip file with readme
+	// id 'distribution' // ¶ for zip file with readme
 	id 'application' // ¶ for run task
 }
 
@@ -21,9 +23,9 @@ dependencies {
 
 	runtimeOnly 'io.grpc:grpc-netty-shaded:1.48.1'
 
+	implementation 'com.auto-traffic-control:auto-traffic-control:0.3.2'
 	implementation 'io.grpc:grpc-protobuf:1.48.1'
 	implementation 'io.grpc:grpc-stub:1.48.1'
-	implementation 'com.auto-traffic-control:auto-traffic-control:0.3.2'
 	// implementation 'org.slf4j:slf4j-api:1.7.25'
 
 	testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
@@ -41,38 +43,40 @@ compileJava {
 
 sourceCompatibility = '1.8'
 
+// ¶ https://github.com/jk1/Gradle-License-Report#configuration
 licenseReport {
 	renderers = [ new JsonReportRenderer('dependency-libraries.json', false ) ]
 }
 
 java {
+	// ¶ to require a specific jre // https://docs.gradle.org/current/userguide/toolchains.html
+	// toolchain { languageVersion = JavaLanguageVersion.of( 11 ) }
 	withSourcesJar()
+	withJavadocJar()
+}
+
+// ¶ https://docs.gradle.org/current/userguide/java_testing.html
+test {
+	useJUnitPlatform()
+}
+
+javadoc {
+	failOnError = false
 }
 
 jar {
 	manifest {
 		attributes(
-			'Main-Class' : 'ws.nzen.game.sim.hao.Haokkoz',
+			'Main-Class' : 'ws.nzen.game.sim.hao.HaoStub',
 			'Automatic-Module-Name' : 'ws.nzen.game.sim.hao.haokkoz',
-			// 'Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join( ' ' )
 		)
 	}
 	from "LICENSE" // ¶ embed this in the jar itself
 }
 
-/* // ¶ for embedding dependencides directly in jar // FIX use shade plugin, instead
-task uberJar(type: Jar) {
-	archiveClassifier = 'uber'
+// ¶ to change the default shadowJar filename // https://imperceptiblethoughts.com/shadow/configuration/
 
-	from sourceSets.main.output
-
-	dependsOn configurations.runtimeClasspath
-	from {
-		configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree( it ) }
-	}
-}
-*/
-
+// ¶ https://docs.gradle.org/current/userguide/application_plugin.html
 run {
 	mainClassName = 'ws.nzen.game.sim.hao.HaoStub'
 }
@@ -84,15 +88,22 @@ task run_( type: JavaExec ) {
 	standardInput = System.in
 }
 
+// ¶ https://docs.gradle.org/current/userguide/signing_plugin.html
+signing {
+	sign publishing.publications
+	useGpgCmd()
+}
 
+// ¶ https://docs.gradle.org/current/userguide/publishing_maven.htm
 publishing {
 	publications {
-		maven( MavenPublication ) {
+		mavenJava( MavenPublication ) {
 			from( components.java )
 			pom {
 				name = project.name
+				description = project.description
 				inceptionYear = '2022'
-				url = ''
+				url = 'https://github.com/Nzen/hircine-anise-okkoz'
 				packaging = 'jar'
 				licenses {
 					license {
@@ -105,55 +116,40 @@ publishing {
 						id = 'Nzen'
 						name = 'Nicholas Prado'
 						email = 'nmprado@nzen.ws'
+						timezone = 'America/Chicago'
+						url = 'www.nzen.ws'
 					}
 				}
-				/*
 				scm {
-					connection = ''
-					developerConnection = ''
-					url = ''
+					connection = 'https://github.com/Nzen/hircine-anise-okkoz.git'
+					developerConnection = 'git@github.com:Nzen/hircine-anise-okkoz.git'
+					url = 'https://github.com/Nzen/hircine-anise-okkoz'
 				}
-				*/
 			}
 			artifact distZip
 		}
 	}
-}
-
-distributions {
-	main {
-		distributionBaseName = 'haokkoz'
-		contents {
-			from 'LICENSE',
-					'readme.adoc',
-					'src/main/assets/cookpad-license-report-flat.json',
-					'changelog.adoc'
-		}
+	repositories {
+		mavenLocal()
+		// mavenCentral()
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*
+// ¶ https://docs.gradle.org/current/userguide/distribution_plugin.html
+distributions {
+	main {
+		distributionBaseName = 'haokkoz_with_readme'
+		contents {
+			from 'LICENSE',
+				'readme.adoc',
+				'build.gradle',
+				'build/report/dependency-libraries.json',
+				'changelog.adoc'
+		}
+	}
+}
+*/
 
 
 
