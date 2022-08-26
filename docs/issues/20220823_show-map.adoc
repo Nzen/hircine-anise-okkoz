@@ -1,0 +1,43 @@
+
+= issue 20220823
+
+== Show Map
+
+* assignee : Nicholas Prado
+* status : to do
+* priority : medium
+
+Retrieve the map from the game and show it in some form, to visually validate success.
+
+Consider letting the viewing person choose the visual elements to show: flight plan, legend of airplanes.
+The latter assumes a different icon for each airplane.
+
+////
+== comments
+
+=== yyMMdd hhMM zzz
+
+comment author : 
+
+comment_here
+////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
