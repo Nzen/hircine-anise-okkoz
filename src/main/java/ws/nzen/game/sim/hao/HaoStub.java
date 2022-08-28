@@ -4,20 +4,21 @@
 
 package ws.nzen.game.sim.hao;
 
-import atc.v1.Atc.GetVersionRequest;
-import atc.v1.Atc.GetVersionResponse;
-import atc.v1.Atc.Version;
-import atc.v1.AtcServiceGrpc;
-import atc.v1.AtcServiceGrpc.AtcServiceBlockingStub;
-import atc.v1.AtcServiceGrpc.AtcServiceFutureStub;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
-import io.grpc.Channel;
-import io.grpc.ManagedChannelBuilder;
+import atc.v1.Game.GetGameStateRequest;
+import atc.v1.Game.GetGameStateResponse;
+import atc.v1.Game.StartGameRequest;
+import atc.v1.Game.StartGameResponse;
 
-import java.util.concurrent.CountDownLatch;
+import ws.nzen.game.sim.hao.adapt.atc.GameServiceAdapter;
+import ws.nzen.game.sim.hao.adapt.atc.GameServiceEndpoint;
+import ws.nzen.game.sim.hao.app.service.Factory;
+import ws.nzen.game.sim.hao.uses.atc.ManagesGameState;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Demonstrates connecting and then starting Auto-Traffic-Control.
@@ -28,65 +29,91 @@ public class HaoStub
 	/**
 	 * Connects to localhost port 4747 and starts game
 	 */
-	public static void main(String[] args) {
-		HaoStub game = new HaoStub("localhost", 4747);
-		boolean whetherAsynchronous = true;
-		game.getVersion(whetherAsynchronous);
+	public static void main(
+			String[] args
+	) {
+		HaoStub game = new HaoStub( "localhost", 4747 );
+		game.start();
+		// CanvasEndpoint view = new CanvasEndpoint( 9998 ); view.start();
 	}
 
-	private Channel channel;
-	private AtcServiceBlockingStub syncingAtcServiceStub;
-	private AtcServiceFutureStub asyncAtcServiceStub;
 
-	public HaoStub(String host, int port) {
-		this(ManagedChannelBuilder.forAddress(host, port).usePlaintext());
+	private static final Logger log = LoggerFactory.getLogger( HaoStub.class );
+	private final ManagesGameState gameService;
+	private final Queue<GetGameStateRequest> gameStateRequests;
+	private final Queue<GetGameStateResponse> gameStateResponses;
+	private final Queue<StartGameRequest> startGameRequests;
+	private final Queue<StartGameResponse> startGameResponses;
+
+
+	public HaoStub(
+			String host, int port
+	) {
+		gameStateRequests = new ConcurrentLinkedQueue<>();
+		gameStateResponses = new ConcurrentLinkedQueue<>();
+		startGameRequests = new ConcurrentLinkedQueue<>();
+		startGameResponses = new ConcurrentLinkedQueue<>();
+		gameService = Factory.managesGameState(
+				host,
+				port,
+				gameStateRequests,
+				gameStateResponses,
+				startGameRequests,
+				startGameResponses );
 	}
 
-	public HaoStub(ManagedChannelBuilder<?> channelBuilder) {
-		channel = channelBuilder.build();
-		syncingAtcServiceStub = AtcServiceGrpc.newBlockingStub(channel);
-		asyncAtcServiceStub = AtcServiceGrpc.newFutureStub(channel);
-	}
 
-	public boolean getVersion(boolean asynchronous) {
-		GetVersionRequest versionRequest = GetVersionRequest.newBuilder().build();
-
-		if (asynchronous) {
-			ListenableFuture<GetVersionResponse> maybeVersion = asyncAtcServiceStub.getVersion(versionRequest);
-
-			int ticksToWait = 1;
-			final CountDownLatch waitForFuture = new CountDownLatch(ticksToWait);
-
-			Futures.addCallback(maybeVersion, new FutureCallback<GetVersionResponse>() {
-				@Override
-				public void onSuccess(GetVersionResponse result) {
-					printVersion(result.getVersion());
-					waitForFuture.countDown();
-				}
-
-				@Override
-				public void onFailure(Throwable t) {
-					throw new Error(t);
-				}
-			}, MoreExecutors.directExecutor());
-			try {
-				waitForFuture.await();
-			} catch (InterruptedException ie) {
-				ie.printStackTrace();
-				return false;
-			}
-			return true; // not actually finished, given the asynchronous communication
-		} else {
-			GetVersionResponse result = syncingAtcServiceStub.getVersion(versionRequest);
-			printVersion(result.getVersion());
-
-			return true;
+	public void start(
+	) {
+		int millisecondsToSleep = 1_000;
+		gameService.startGame();
+		try
+		{
+			Thread.sleep( millisecondsToSleep );
+			gameService.requestGameState();
+			Thread.sleep( millisecondsToSleep );
+			if ( ! gameStateResponses.isEmpty() )
+				log.info( gameStateResponses.poll().getGameState().toString() );
+			Thread.sleep( millisecondsToSleep * 5 );
+			gameService.quit();
+		}
+		catch ( InterruptedException ie )
+		{
+			log.error( ie.toString() );
 		}
 	}
 
-	private static void printVersion(
-			Version version
-	) {
-		System.out.println("Auto Traffic Control is running version " + version.getMajor() + "." + version.getMinor() + "." + version.getPatch());
-	}
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
