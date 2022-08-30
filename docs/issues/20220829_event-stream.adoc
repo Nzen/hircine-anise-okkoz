@@ -1,0 +1,41 @@
+
+= issue 20220829
+
+== Print game event stream
+
+* assignee : Nicholas Prado
+* status : in progress
+* priority : high
+
+Consume the game event stream and reprint it to simple standard out.
+This ensures that we can notice airplanes arriving and start to get a sense of how often these arrive.
+
+////
+== comments
+
+=== yyMMdd hhMM zzz
+
+comment author : 
+
+comment_here
+////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
