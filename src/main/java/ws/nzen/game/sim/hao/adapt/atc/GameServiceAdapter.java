@@ -64,23 +64,4 @@ public class GameServiceAdapter implements ManagesGameState
 		startGameRequests.offer( StartGameRequest.newBuilder().build() );
 	}
 
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

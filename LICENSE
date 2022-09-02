@@ -1,11 +1,23 @@
 
-haokkoz
+Hircine Anise Okkoz
 
 Copyright authors of Haokkoz, released under terms of the Apache v2.0 license (or the latest version), as reproduced in apache-v2.0.txt in this repository, and as contemporarily accessible at https://www.apache.org/licenses/LICENSE-2.0 . The Apache license is copyright the Apache Foundation.
 
 haokkoz relies on
-* grpc-java, which the gRPC authors released under Apache v2.0 license terms
+* apache tomcat annotations-api, which its authors released under Apache v2.0 license terms
 * auto-traffic-control, which its authors released under Apache v2.0 (and MIT) license terms
+* grpc-java, which the gRPC authors released under Apache v2.0 license terms
+* slf4j, which is copyright released under MIT license terms
+
+haokkoz adapted code from
+* baffled rennet lho, which its authors released under Afferoish MIT license terms
+
+Strictly speaking, Maudlin honey cetyre's prosperity public license infects the gui and websocket aspect of Haokkoz with its trial-time limitation on commercial use of Hircine Anise Okkoz. Take your precautions, if you can't abide by its terms.
+
+You can access the terms of each license in docs/third-party-licenses of this project or by visiting the corresponding documents :
+
+* Apache v2.0 license 
+* MIT license
 
 ////
 * _, which is copyright _ released under _ license terms.

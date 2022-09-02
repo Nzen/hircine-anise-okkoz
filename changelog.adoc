@@ -5,6 +5,26 @@
 the authors of Haokkoz release this file under the terms of the Apache license v2.0
 ////
 
+
+== [0.0-alpha-0.0] - 2022-08-23
+
+=== Added
+
+* i20220814 initialized with copy of example auto-traffic-control client
+
+== [0.0-alpha-1.0] - 2022-08-28
+
+=== Changed
+
+* i20220814 able to start game concurrently
+
+== [0.0-alpha-2.0] - 2022-08-28
+
+=== Added
+
+* i20220829 prints event stream to std out
+
+////
 == Unreleased
 
 === Added
@@ -19,5 +39,6 @@ the authors of Haokkoz release this file under the terms of the Apache license v
 
 * 
 
-== [0.0] - 22-0-
+== [0.0] - 2022-0-
+////
 

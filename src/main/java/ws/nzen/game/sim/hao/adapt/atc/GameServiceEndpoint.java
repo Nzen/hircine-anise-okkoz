@@ -49,11 +49,13 @@ public class GameServiceEndpoint implements Runnable
 			Queue<StartGameRequest> forStartGameRequests,
 			Queue<StartGameResponse> forStartGameResponses
 	) {
-		this( ManagedChannelBuilder.forAddress(host, port).usePlaintext(),
+		this(
+				ManagedChannelBuilder.forAddress( host, port ).usePlaintext(),
 				forGameStateRequests,
 				forGameStateResponses,
 				forStartGameRequests,
-				forStartGameResponses );
+				forStartGameResponses
+		);
 	}
 
 
@@ -96,11 +98,13 @@ public class GameServiceEndpoint implements Runnable
 		final CountDownLatch finishLatch = new CountDownLatch( timesToTry );
 		StreamObserver<GetGameStateResponse> callback = new StreamObserver<GetGameStateResponse>()
 		{
+
 			@Override
 			public void onCompleted(
 			) {
 				finishLatch.countDown();
 			}
+
 
 			@Override
 			public void onError(
@@ -109,6 +113,7 @@ public class GameServiceEndpoint implements Runnable
 				log.error( problem.toString() );
 				onCompleted();
 			}
+
 
 			@Override
 			public void onNext(
@@ -135,11 +140,13 @@ public class GameServiceEndpoint implements Runnable
 		final CountDownLatch finishLatch = new CountDownLatch( timesToTry );
 		StreamObserver<StartGameResponse> callback = new StreamObserver<StartGameResponse>()
 		{
+
 			@Override
 			public void onCompleted(
 			) {
 				finishLatch.countDown();
 			}
+
 
 			@Override
 			public void onError(
@@ -148,6 +155,7 @@ public class GameServiceEndpoint implements Runnable
 				log.error( problem.toString() );
 				onCompleted();
 			}
+
 
 			@Override
 			public void onNext(
@@ -169,15 +177,19 @@ public class GameServiceEndpoint implements Runnable
 		{
 			while ( true )
 			{
-				if ( ! gameStateRequests.isEmpty() )
+				while ( ! gameStateRequests.isEmpty() )
 				{
 					GetGameStateRequest gameStateRequest = gameStateRequests.poll();
+					if ( gameStateRequest == null )
+						break;
 					requestGameState( gameStateRequest );
 				}
 
-				if ( ! startGameRequests.isEmpty() )
+				while ( ! startGameRequests.isEmpty() )
 				{
 					StartGameRequest gameStartRequest = startGameRequests.poll();
+					if ( gameStartRequest == null )
+						break;
 					requestStartGame( gameStartRequest );
 				}
 
@@ -190,37 +202,4 @@ public class GameServiceEndpoint implements Runnable
 		}
 	}
 
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

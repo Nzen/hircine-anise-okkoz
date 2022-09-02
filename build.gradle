@@ -4,9 +4,10 @@
 import com.github.jk1.license.render.*
 
 plugins {
-	id 'com.github.jk1.dependency-license-report' version '2.0'
+	id 'com.github.jk1.dependency-license-report' version '2.0' // ¶ task generateLicenseReport to see dependency licenses
+	id 'com.github.ben-manes.versions' version '0.42.0'  // ¶ task dependencyUpdates to see updated libraries
 	id 'java'
-	// id 'com.github.johnrengelman.shadow' version '7.1.2'
+	// id 'com.github.johnrengelman.shadow' version '7.1.2' // ¶ for uber jar
 	id 'signing'
 	id 'maven-publish'
 	// id 'distribution' // ¶ for zip file with readme
@@ -26,19 +27,22 @@ dependencies {
 	implementation 'com.auto-traffic-control:auto-traffic-control:0.3.2'
 	implementation 'io.grpc:grpc-protobuf:1.48.1'
 	implementation 'io.grpc:grpc-stub:1.48.1'
-	// implementation 'org.slf4j:slf4j-api:1.7.25'
+	implementation 'org.slf4j:slf4j-api:1.7.25'
+	implementation 'org.slf4j:slf4j-simple:1.7.25'
 
 	testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
 }
 
 group = 'ws.nzen.game.sim.hao'
-version = '0.0-alpha-0.0'
-description = 'Communicates with jndo Auto-Traffic-Control'
+version = '0.0-alpha-2.0'
+description = 'Communicates with jndo Auto-Traffic-Control to guide planes'
+
+// ¶ https://github.com/diffplug/spotless/tree/main/plugin-gradle
 
 compileJava {
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 sourceCompatibility = '1.8'
@@ -48,6 +52,7 @@ licenseReport {
 	renderers = [ new JsonReportRenderer('dependency-libraries.json', false ) ]
 }
 
+// ¶ https://docs.gradle.org/current/userguide/building_java_projects.html
 java {
 	// ¶ to require a specific jre // https://docs.gradle.org/current/userguide/toolchains.html
 	// toolchain { languageVersion = JavaLanguageVersion.of( 11 ) }
@@ -60,8 +65,9 @@ test {
 	useJUnitPlatform()
 }
 
+// ¶ https://docs.gradle.org/current/userguide/building_java_projects.html#sec:generating_javadocs
 javadoc {
-	failOnError = false
+	// failOnError = false
 }
 
 jar {
@@ -84,8 +90,29 @@ run {
 task run_( type: JavaExec ) {
 	group = 'application'
 	classpath = sourceSets.main.runtimeClasspath
-	main = 'ws.nzen.game.sim.hao.HaoStub'
+	mainClass = 'ws.nzen.game.sim.hao.HaoStub'
 	standardInput = System.in
+}
+
+// ¶ signs jar file with keystore certificate
+task jsin( type:Exec, dependsOn: jar ) {
+	workingDir project.projectDir
+	commandLine project.jarsigner,
+			// '-verbose',
+			'-keystore', project.keyStore,
+			'-storepass', project.keyStorePass,
+			'-keypass', project.keyStoreKeyPass,
+			'-tsa', project.tsa,
+			'build/libs/'+ project.name +'-'+ project.version +'.jar',
+			project.keyStoreAlias
+}
+
+task jvify( type:Exec, dependsOn: jar ) {
+	workingDir project.projectDir
+	commandLine project.jarsigner,
+			// '-verbose',
+			'-verify',
+			'build/libs/'+ project.name +'-'+ project.version +'.jar'
 }
 
 // ¶ https://docs.gradle.org/current/userguide/signing_plugin.html
@@ -126,7 +153,7 @@ publishing {
 					url = 'https://github.com/Nzen/hircine-anise-okkoz'
 				}
 			}
-			artifact distZip
+			// artifact distZip
 		}
 	}
 	repositories {
@@ -150,6 +177,11 @@ distributions {
 	}
 }
 */
+
+// ¶ ensures that this signs jar contents before gpg signing
+tasks.named( 'generateMetadataFileForMavenJavaPublication' ) {
+	dependsOn( 'jsin' )
+}
 
 
 
