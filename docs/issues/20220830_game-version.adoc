@@ -1,0 +1,40 @@
+
+= issue 20220830
+
+== Show game version
+
+* assignee : Nicholas Prado
+* status : to do
+* priority : low
+
+Ensure that this shows the game version as the game starts.
+
+////
+== comments
+
+=== yyMMdd hhMM zzz
+
+comment author : 
+
+comment_here
+////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
