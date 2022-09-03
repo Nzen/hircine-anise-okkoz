@@ -101,8 +101,6 @@ public class EventServiceEndpoint implements Runnable
 					StreamResponse event
 			) {
 				responses.offer( event );
-				if ( event.hasAirplaneDetected() )
-					log.info( "airplane arrived: "+ event.getAirplaneDetected().getAirplane().getId() );
 			}
 		};
 

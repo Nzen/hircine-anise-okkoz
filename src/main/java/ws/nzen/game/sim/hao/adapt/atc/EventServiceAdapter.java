@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import atc.v1.Event.StreamRequest;
 import atc.v1.Event.StreamResponse;
-import ws.nzen.game.sim.hao.game.AtcEvent;
+import ws.nzen.game.sim.hao.game.*;
 import ws.nzen.game.sim.hao.uses.atc.RequestsEvents;
 
 
@@ -29,6 +29,7 @@ public class EventServiceAdapter implements RequestsEvents, Runnable
 	private final EventServiceEndpoint eventService;
 	private int millisecondsToSleep = 200;
 	private final Queue<AtcEvent> events;
+	private final Queue<AtcEventGameStarted> gameStartEvents;
 	private final Queue<StreamRequest> requests;
 	private final Queue<StreamResponse> responses;
 	private final Thread runsEventService;
@@ -39,7 +40,8 @@ public class EventServiceAdapter implements RequestsEvents, Runnable
 			EventMapper mapper,
 			Queue<StreamRequest> forRequests,
 			Queue<StreamResponse> forResponses,
-			Queue<AtcEvent> atcEvents
+			Queue<AtcEvent> atcEvents,
+			Queue<AtcEventGameStarted> gameStartEvents
 	) {
 		if ( forRequests == null )
 			throw new NullPointerException( "forRequests must not be null" );
@@ -47,12 +49,15 @@ public class EventServiceAdapter implements RequestsEvents, Runnable
 			throw new NullPointerException( "endpoint must not be null" );
 		else if ( atcEvents == null )
 			throw new NullPointerException( "atcEvents must not be null" );
+		else if ( gameStartEvents == null )
+			throw new NullPointerException( "gameStartEvents must not be null" );
 		else if ( mapper == null )
 			throw new NullPointerException( "mapper must not be null" );
 		eventService = eventStream;
 		requests = forRequests;
 		responses = forResponses;
 		events = atcEvents;
+		this.gameStartEvents = gameStartEvents;
 		eventMapper = mapper;
 		runsEventService = new Thread( eventService );
 		runsEventService.start();
@@ -86,7 +91,11 @@ public class EventServiceAdapter implements RequestsEvents, Runnable
 					StreamResponse response = responses.poll();
 					if ( response == null )
 						break;
-					events.offer( eventMapper.asHaoEvent( response ) );
+					AtcEvent event = eventMapper.asHaoEvent( response );
+					if ( event.getType() == AtcEventType.GAME_STARTED )
+						gameStartEvents.offer( (AtcEventGameStarted)event );
+					else
+						events.offer( event );
 				}
 
 				Thread.sleep( millisecondsToSleep );
@@ -99,3 +108,52 @@ public class EventServiceAdapter implements RequestsEvents, Runnable
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

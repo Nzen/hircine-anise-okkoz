@@ -67,6 +67,8 @@ public class StdOutAdapter implements ShowsEvents, Runnable
 					Object blob = blobs.poll();
 					if ( blob == null )
 						break;
+else if ( blob instanceof ws.nzen.game.sim.hao.game.AtcEventAirplaneMoved )
+	continue;
 					showMessage( blob );
 				}
 

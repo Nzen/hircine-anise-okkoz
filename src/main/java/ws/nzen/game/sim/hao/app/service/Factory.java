@@ -7,19 +7,13 @@ package ws.nzen.game.sim.hao.app.service;
 
 import java.util.Queue;
 
-import atc.v1.Event.StreamRequest;
-import atc.v1.Event.StreamResponse;
-import atc.v1.Game.GetGameStateRequest;
-import atc.v1.Game.GetGameStateResponse;
-import atc.v1.Game.StartGameRequest;
-import atc.v1.Game.StartGameResponse;
+import atc.v1.Event.*;
+import atc.v1.Game.*;
 import ws.nzen.game.sim.hao.adapt.atc.*;
-import ws.nzen.game.sim.hao.adapt.cli.StdOutAdapter;
-import ws.nzen.game.sim.hao.adapt.cli.StdOutEndpoint;
-import ws.nzen.game.sim.hao.game.AtcEvent;
-import ws.nzen.game.sim.hao.uses.atc.ManagesGameState;
-import ws.nzen.game.sim.hao.uses.atc.RequestsEvents;
-import ws.nzen.game.sim.hao.uses.view.ShowsEvents;
+import ws.nzen.game.sim.hao.adapt.cli.*;
+import ws.nzen.game.sim.hao.game.*;
+import ws.nzen.game.sim.hao.uses.atc.*;
+import ws.nzen.game.sim.hao.uses.view.*;
 
 
 /**
@@ -49,14 +43,16 @@ public class Factory
 			EventMapper mapper,
 			Queue<StreamRequest> forRequests,
 			Queue<StreamResponse> forResponses,
-			Queue<AtcEvent> atcEvents
+			Queue<AtcEvent> atcEvents,
+			Queue<AtcEventGameStarted> gameStartEvents
 	) {
 		return new EventServiceAdapter(
 				eventStream,
 				mapper,
 				forRequests,
 				forResponses,
-				atcEvents
+				atcEvents,
+				gameStartEvents
 		);
 	}
 
@@ -143,6 +139,21 @@ public class Factory
 	}
 
 
+	public static MapDispatch mapDispatch(
+			Queue<AtcEventGameStarted> events
+	) {
+		return new MapDispatch( new MapCache(), events );
+	}
+
+
+	public static MapDispatch mapDispatch(
+			MapCache mapCache,
+			Queue<AtcEventGameStarted> events
+	) {
+		return new MapDispatch( mapCache, events );
+	}
+
+
 	public static MapMapper mapMapper(
 	) {
 		return new MapMapper( airportMapper(), nodeMapper() );
@@ -166,7 +177,8 @@ public class Factory
 			int port,
 			Queue<StreamRequest> forRequests,
 			Queue<StreamResponse> forResponses,
-			Queue<AtcEvent> atcEvents
+			Queue<AtcEvent> atcEvents,
+			Queue<AtcEventGameStarted> gameStartEvents
 	) {
 		EventServiceEndpoint endpoint = eventServiceEndpoint(
 				host,
@@ -179,7 +191,8 @@ public class Factory
 				eventMapper(),
 				forRequests,
 				forResponses,
-				atcEvents
+				atcEvents,
+				gameStartEvents
 		);
 	}
 
