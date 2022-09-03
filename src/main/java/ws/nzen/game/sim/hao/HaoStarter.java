@@ -26,19 +26,19 @@ import ws.nzen.game.sim.hao.uses.view.ShowsEvents;
 
 
 /** Demonstrates connecting and then starting Auto-Traffic-Control. */
-public class HaoStub
+public class HaoStarter
 {
 
 	/** Connects to localhost port 4747 and starts game */
 	public static void main(
 			String[] args
 	) {
-		HaoStub game = new HaoStub( "localhost", 4747 );
+		HaoStarter game = new HaoStarter( "localhost", 4747 );
 		game.start();
 		// CanvasEndpoint view = new CanvasEndpoint( 9998 ); view.start();
 	}
 
-	private static final Logger					log	= LoggerFactory.getLogger( HaoStub.class );
+	private static final Logger					log	= LoggerFactory.getLogger( HaoStarter.class );
 	private final ManagesGameState				gameService;
 	private final Queue<AtcEvent>				atcEvents;
 	private final Queue<GetGameStateRequest>	gameStateRequests;
@@ -54,7 +54,7 @@ public class HaoStub
 	private final Thread runsStdout;
 
 
-	public HaoStub(
+	public HaoStarter(
 			String host, int port
 	) {
 		atcEvents = new ConcurrentLinkedQueue<>();

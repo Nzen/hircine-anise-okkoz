@@ -40,12 +40,17 @@ description = 'Communicates with jndo Auto-Traffic-Control to guide planes'
 
 // ¶ https://github.com/diffplug/spotless/tree/main/plugin-gradle
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+
 compileJava {
 	sourceCompatibility = JavaVersion.VERSION_1_8
 	targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-sourceCompatibility = '1.8'
+compileTestJava {
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+}
 
 // ¶ https://github.com/jk1/Gradle-License-Report#configuration
 licenseReport {
@@ -54,6 +59,7 @@ licenseReport {
 
 // ¶ https://docs.gradle.org/current/userguide/building_java_projects.html
 java {
+	options.encoding = 'UTF-8'
 	// ¶ to require a specific jre // https://docs.gradle.org/current/userguide/toolchains.html
 	// toolchain { languageVersion = JavaLanguageVersion.of( 11 ) }
 	withSourcesJar()
@@ -63,6 +69,9 @@ java {
 // ¶ https://docs.gradle.org/current/userguide/java_testing.html
 test {
 	useJUnitPlatform()
+	testLogging {
+		exceptionFormat = 'full'
+	}
 }
 
 // ¶ https://docs.gradle.org/current/userguide/building_java_projects.html#sec:generating_javadocs
@@ -73,7 +82,7 @@ javadoc {
 jar {
 	manifest {
 		attributes(
-			'Main-Class' : 'ws.nzen.game.sim.hao.HaoStub',
+			'Main-Class' : 'ws.nzen.game.sim.hao.HaoStarter',
 			'Automatic-Module-Name' : 'ws.nzen.game.sim.hao.haokkoz',
 		)
 	}
@@ -84,13 +93,13 @@ jar {
 
 // ¶ https://docs.gradle.org/current/userguide/application_plugin.html
 run {
-	mainClassName = 'ws.nzen.game.sim.hao.HaoStub'
+	mainClassName = 'ws.nzen.game.sim.hao.HaoStarter'
 }
 
 task run_( type: JavaExec ) {
 	group = 'application'
 	classpath = sourceSets.main.runtimeClasspath
-	mainClass = 'ws.nzen.game.sim.hao.HaoStub'
+	mainClass = 'ws.nzen.game.sim.hao.HaoStarter'
 	standardInput = System.in
 }
 
