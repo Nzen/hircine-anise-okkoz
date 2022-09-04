@@ -4,7 +4,7 @@
 == Print game event stream
 
 * assignee : Nicholas Prado
-* status : in review
+* status : complete
 * priority : high
 
 Consume the game event stream and reprint it to simple standard out.
