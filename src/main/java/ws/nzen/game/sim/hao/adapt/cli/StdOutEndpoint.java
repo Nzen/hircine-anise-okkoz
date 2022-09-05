@@ -10,16 +10,20 @@ import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ws.nzen.game.sim.hao.uses.any.Quittable;
+
+
 
 /**
 
 */
-public class StdOutEndpoint implements Runnable
+public class StdOutEndpoint implements Runnable, Quittable
 {
 
 	public static final String QUIT = "QUIT";
 	private static final Logger log = LoggerFactory
 			.getLogger( StdOutEndpoint.class );
+	private boolean quit = false;
 	private int millisecondsToSleep = 200;
 	private final Queue<String> messagesToLog;
 
@@ -40,8 +44,15 @@ public class StdOutEndpoint implements Runnable
 	}
 
 
-	/** Check queue for requests to print */
 	@Override
+	public void quit(
+	) {
+		quit = true;
+	}
+
+
+	@Override
+	/** Check queue for requests to print */
 	public void run(
 	) {
 		try
@@ -59,6 +70,8 @@ public class StdOutEndpoint implements Runnable
 						log.info( said );
 				}
 				Thread.sleep( millisecondsToSleep );
+				if ( quit )
+					return;
 			}
 		}
 		catch ( InterruptedException ie )

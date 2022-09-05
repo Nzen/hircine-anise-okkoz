@@ -15,6 +15,7 @@ import atc.v1.GameServiceGrpc.GameServiceStub;
 import io.grpc.Channel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+import ws.nzen.game.sim.hao.uses.any.Quittable;
 
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
@@ -26,12 +27,13 @@ import org.slf4j.LoggerFactory;
 /**
 
 */
-public class GameServiceEndpoint implements Runnable
+public class GameServiceEndpoint implements Runnable, Quittable
 {
 
 	private static final Logger log = LoggerFactory
 			.getLogger( GameServiceEndpoint.class );
 
+	private boolean quit = false;
 	private Channel channel;
 	private GameServiceStub gameService;
 	private int millisecondsToSleep = 200;
@@ -82,6 +84,13 @@ public class GameServiceEndpoint implements Runnable
 		gameStateResponses = forGameStateResponses;
 		startGameRequests = forStartGameRequests;
 		startGameResponses = forStartGameResponses;
+	}
+
+
+	@Override
+	public void quit(
+	) {
+		quit = true;
 	}
 
 
@@ -169,8 +178,8 @@ public class GameServiceEndpoint implements Runnable
 	}
 
 
-	/** Check for requests, send a null request to quit */
 	@Override
+	/** Check for requests, send a null request to quit */
 	public void run(
 	) {
 		try
@@ -194,6 +203,8 @@ public class GameServiceEndpoint implements Runnable
 				}
 
 				Thread.sleep( millisecondsToSleep );
+				if ( quit )
+					return;
 			}
 		}
 		catch ( InterruptedException ie )

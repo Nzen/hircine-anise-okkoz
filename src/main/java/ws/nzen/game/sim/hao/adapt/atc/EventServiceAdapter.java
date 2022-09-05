@@ -12,19 +12,22 @@ import org.slf4j.LoggerFactory;
 
 import atc.v1.Event.StreamRequest;
 import atc.v1.Event.StreamResponse;
+
 import ws.nzen.game.sim.hao.game.*;
+import ws.nzen.game.sim.hao.uses.any.Quittable;
 import ws.nzen.game.sim.hao.uses.atc.RequestsEvents;
 
 
 /**
 
 */
-public class EventServiceAdapter implements RequestsEvents, Runnable
+public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 {
 
 	private static final Logger log = LoggerFactory
 			.getLogger( EventServiceAdapter.class );
 
+	private boolean quit = false;
 	private final EventMapper eventMapper;
 	private final EventServiceEndpoint eventService;
 	private int millisecondsToSleep = 200;
@@ -74,12 +77,13 @@ public class EventServiceAdapter implements RequestsEvents, Runnable
 	@Override
 	public void quit(
 	) {
+		quit = true;
 		runsEventService.interrupt();
 	}
 
 
-	/** Check for requests, send a null request to quit */
 	@Override
+	/** Check for requests, copy these to outgoing queue. */
 	public void run(
 	) {
 		try
@@ -99,6 +103,8 @@ public class EventServiceAdapter implements RequestsEvents, Runnable
 				}
 
 				Thread.sleep( millisecondsToSleep );
+				if ( quit )
+					return;
 			}
 		}
 		catch ( InterruptedException ie )

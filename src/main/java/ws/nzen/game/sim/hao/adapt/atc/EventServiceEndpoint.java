@@ -19,16 +19,18 @@ import org.slf4j.LoggerFactory;
 import io.grpc.Channel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+import ws.nzen.game.sim.hao.uses.any.Quittable;
 
 
 /**
 
 */
-public class EventServiceEndpoint implements Runnable
+public class EventServiceEndpoint implements Runnable, Quittable
 {
 
 	private static final Logger log = LoggerFactory
 			.getLogger( EventServiceEndpoint.class );
+	private boolean quit = false;
 	private Channel channel;
 	private EventServiceStub eventService;
 	private int millisecondsToSleep = 200;
@@ -63,6 +65,13 @@ public class EventServiceEndpoint implements Runnable
 		eventService = EventServiceGrpc.newStub( channel );
 		requests = forRequests;
 		responses = forResponses;
+	}
+
+
+	@Override
+	public void quit(
+	) {
+		quit = true;
 	}
 
 
@@ -108,8 +117,8 @@ public class EventServiceEndpoint implements Runnable
 	}
 
 
-	/** Check for event requests, send a null request to quit */
 	@Override
+	/** Check for event requests, send a null request to quit */
 	public void run(
 	) {
 		try
@@ -124,6 +133,8 @@ public class EventServiceEndpoint implements Runnable
 					requestMoreEvents( request );
 				}
 				Thread.sleep( millisecondsToSleep );
+				if ( quit )
+					return;
 			}
 		}
 		catch ( InterruptedException ie )

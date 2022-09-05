@@ -10,13 +10,14 @@ import atc.v1.Game.StartGameRequest;
 
 import java.util.Queue;
 
+import ws.nzen.game.sim.hao.uses.any.Quittable;
 import ws.nzen.game.sim.hao.uses.atc.ManagesGameState;
 
 
 /**
 
 */
-public class GameServiceAdapter implements ManagesGameState
+public class GameServiceAdapter implements ManagesGameState, Quittable
 {
 
 	private final GameServiceEndpoint gameService;
@@ -33,9 +34,9 @@ public class GameServiceAdapter implements ManagesGameState
 		if ( endpoint == null )
 			throw new NullPointerException( "endpoint must not be null" );
 		else if ( forGameStateRequests == null )
-			throw new NullPointerException( "game state msg in must not be null" );
+			throw new NullPointerException( "forGameStateRequests must not be null" );
 		else if ( forStartGameRequests == null )
-			throw new NullPointerException( "game start msg in must not be null" );
+			throw new NullPointerException( "forStartGameRequests must not be null" );
 		gameService = endpoint;
 		gameStateRequests = forGameStateRequests;
 		startGameRequests = forStartGameRequests;

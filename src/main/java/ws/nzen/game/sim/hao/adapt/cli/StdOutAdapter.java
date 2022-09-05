@@ -10,6 +10,7 @@ import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ws.nzen.game.sim.hao.uses.any.Quittable;
 import ws.nzen.game.sim.hao.uses.view.ShowsEvents;
 
 
@@ -17,11 +18,12 @@ import ws.nzen.game.sim.hao.uses.view.ShowsEvents;
 Adapts between other subsystems and StdOutEndpoint.
 Mostly does so by consuming the Object stream, at this time.
 */
-public class StdOutAdapter implements ShowsEvents, Runnable
+public class StdOutAdapter implements ShowsEvents, Runnable, Quittable
 {
 
 	private static final Logger log = LoggerFactory
 			.getLogger( StdOutAdapter.class );
+	private boolean quit = false;
 	private int millisecondsToSleep = 200;
 	private final Queue<String> messages;
 	private final Queue<? extends Object> blobs;
@@ -48,14 +50,16 @@ public class StdOutAdapter implements ShowsEvents, Runnable
 	}
 
 
+	@Override
 	public void quit(
 	) {
+		quit = true;
 		runsStdout.interrupt();
 	}
 
 
-	/** Check queue for requests to print */
 	@Override
+	/** Check queue for requests to show */
 	public void run(
 	) {
 		try
@@ -68,11 +72,13 @@ public class StdOutAdapter implements ShowsEvents, Runnable
 					if ( blob == null )
 						break;
 else if ( blob instanceof ws.nzen.game.sim.hao.game.AtcEventAirplaneMoved )
-	continue;
+	continue; // ¶ ignore deluge of airplane movement events
 					showMessage( blob );
 				}
 
 				Thread.sleep( millisecondsToSleep );
+				if ( quit )
+					return;
 			}
 		}
 		catch ( InterruptedException ie )

@@ -14,6 +14,8 @@ import atc.v1.Game.StartGameResponse;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import ws.nzen.game.sim.hao.app.service.Factory;
 import ws.nzen.game.sim.hao.app.service.MapDispatch;
 import ws.nzen.game.sim.hao.game.AtcEvent;
 import ws.nzen.game.sim.hao.game.AtcEventGameStarted;
+import ws.nzen.game.sim.hao.uses.atc.KnowsMap;
 import ws.nzen.game.sim.hao.uses.atc.ManagesGameState;
 import ws.nzen.game.sim.hao.uses.atc.RequestsEvents;
 import ws.nzen.game.sim.hao.uses.view.ShowsEvents;
@@ -41,8 +44,9 @@ public class HaoStarter
 	}
 
 	private static final Logger					log	= LoggerFactory.getLogger( HaoStarter.class );
+	private final ExecutorService threads;
+	private final KnowsMap map;
 	private final ManagesGameState				gameService;
-	private final MapDispatch map;
 	private final Queue<AtcEvent>				atcEvents;
 	private final Queue<AtcEventGameStarted> gameStartEvents;
 	private final Queue<GetGameStateRequest>	gameStateRequests;
@@ -54,9 +58,6 @@ public class HaoStarter
 	private final Queue<String>					messageForStdOut;
 	private final RequestsEvents				eventService;
 	private final ShowsEvents					stdOut;
-	private final Thread runsEvents;
-	private final Thread runsStdout;
-	private final Thread runsMap;
 
 
 	public HaoStarter(
@@ -71,6 +72,7 @@ public class HaoStarter
 		streamRequests = new ConcurrentLinkedQueue<>();
 		streamResponses = new ConcurrentLinkedQueue<>();
 		messageForStdOut = new ConcurrentLinkedQueue<>();
+		threads = Executors.newCachedThreadPool();
 		gameService = Factory.managesGameState(
 				host,
 				port,
@@ -87,14 +89,12 @@ public class HaoStarter
 				atcEvents,
 				gameStartEvents
 		);
-		runsEvents = new Thread( eventService );
-		runsEvents.start();
+		threads.execute( eventService );
 		stdOut = Factory.showsEvents( messageForStdOut, atcEvents );
-		runsStdout = new Thread( stdOut );
-		runsStdout.start();
-		map = Factory.mapDispatch( gameStartEvents );
-		runsMap = new Thread( map );
-		runsMap.start();
+		threads.execute( stdOut );
+		MapDispatch mapThing = Factory.mapDispatch( gameStartEvents );
+		map = mapThing;
+		threads.execute( mapThing );
 	}
 
 
@@ -103,9 +103,7 @@ public class HaoStarter
 		gameService.quit();
 		eventService.quit();
 		stdOut.quit();
-		runsStdout.interrupt();
-		runsEvents.interrupt();
-		runsMap.interrupt();
+		threads.shutdownNow();
 	}
 
 
