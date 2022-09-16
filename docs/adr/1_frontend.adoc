@@ -1,0 +1,37 @@
+
+= 1 Frontend implementation language
+
+Status : 
+
+== Context
+
+Auto-traffic-control shows some of the information (the map), but does not show things like flight plans.
+
+How can we visualize this information ?
+
+== Decision
+
+Adapt Maudlin Honey Cetyre's 'ascii' canvas and websocket protocol to show relevant information.
+
+== Deciders
+
+* Nicholas Prado
+
+== Consequences
+
+MHC is released under the prosperity public license.
+If someone wanted to adapt Haokkoz commercially, but could not comply with the terms of that license, this entity would either abandon the effort or need to write a separate front end.
+
+MHC has some baggage based on its origin as a text ui for a roguelike game.
+Anything that is finer than a single character needs that information encoded in that character or its color.
+
+////
+status : { proposed | rejected | accepted | deprecated | superseded }
+
+context - decision drivers, problem statement
+== Consequences
+== Outcomes
+== Alternatives
+== Links / related decisions, artifacts
+////
+

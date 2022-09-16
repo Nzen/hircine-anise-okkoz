@@ -1,0 +1,33 @@
+
+= # Template for architecture decision records
+
+Status : 
+
+== Context
+
+
+
+== Decision
+
+
+
+=== Deciders
+
+* 
+
+== Consequences
+
+
+
+////
+status : { proposed | rejected | accepted | deprecated | superseded }
+
+== Outcomes
+
+
+context - decision drivers, problem statement
+
+== Alternatives
+== Links / related decisions, artifacts
+////
+

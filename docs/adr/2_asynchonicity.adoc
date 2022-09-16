@@ -1,0 +1,34 @@
+
+= 2 Asynchronicity
+
+Status : Accepted
+
+== Context
+
+Auto-traffic-control publishes events via a grpc stream.
+That requires interacting with the messages asynchronously, even if everything else is synchronous.
+Decide the https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/[scope of asynchronicity] in Haokkoz.
+
+== Decision
+
+Wire together the adapters with concurrent queues and consume from these at a fixed rate.
+
+== Deciders
+
+* Nicholas Prado
+
+== Outcomes
+
+At the time being, this involves nine threads, managed by an unbounded Executor.
+Ensuring that the right things connect has become complicated enough that I needed to involve graphviz to explicitly expose what connects to what.
+
+////
+status : { proposed | rejected | accepted | deprecated | superseded }
+
+context - decision drivers, problem statement
+== Consequences
+== Outcomes
+== Alternatives
+== Links / related decisions, artifacts
+////
+

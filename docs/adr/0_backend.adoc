@@ -1,0 +1,33 @@
+
+= 0 Backend implementation language
+
+Status : accepted
+
+== Context
+
+What language should we implement the modules that communicate with Auto-Traffic-Control with ?
+
+== Decision
+
+Java. I am most comfortable with java and the point of this is to learn about grpc and not some language that I barely (go-lang) or don't at all (clojure) know.
+
+== Deciders
+
+* Nicholas Prado
+
+== Consequences
+
+People hoping for some other language may either need to read it carefully or may not refer to this project at all.
+
+Anyone hoping to run haokkoz itself will need a jre.
+
+////
+status : { proposed | rejected | accepted | deprecated | superseded }
+
+context - decision drivers, problem statement
+== Consequences
+== Outcomes
+== Alternatives
+== Links / related decisions, artifacts
+////
+
