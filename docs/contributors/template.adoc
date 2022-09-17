@@ -1,0 +1,12 @@
+
+= Contributor license agreement - Hircine Anise Okkoz
+
+== Purpose
+
+Contributors and users need confidence that Hircine Anise Okkoz is consistently licensed under the terms of the Apache license. So, contributors must affirm that they release their contributions under those same terms.
+
+== Agreement
+
+I, xxxxx, using the username yyyy or any other, affirm that I release all of my contributions to the software project called Hircine Anise Okkoz under the terms of the Apache license v2.0 or any later version, as accessible in this project or at https://www.apache.org/licenses/LICENSE-2.0.txt.
+
+-- 20-0-
