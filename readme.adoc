@@ -3,19 +3,32 @@
 
 == Purpose
 
-haokkoz plays jdno's Auto Traffic Control game.
+Hircine Anise Okkoz (will eventually) plays jdno's [Auto Traffic Control](https://auto-traffic-control.com/docs) game.
+That is to say, it is a grpc client that connects to an ATC server and receives events (and eventually issues its own).
 
 == License
 
-haokkoz is released under the terms of the Apache license v2.0 (or the most recently published).
+Hircine Anise Okkoz is released under the terms of the Apache license v2.0 (or the most recently published).
 
 == Run
 
-
+. Start atc
+. Start hao
+. Open webpage
 
 == Name
 
-hircine (goat-like) anise okkoz 4(Proto-Berber
+The full name of this project is Hircine Anise Okkoz, though it is contracted to Haokkoz in a number of places.
+It is a three word phrase with no particular meaning.
+Hircine means goat like.
+Anise is a flowing plant used as a spice.
+Okkoz is a latinization of numeral 4 in the Proto-Berber language.
+
+== Status
+
+0.0-alpha-3.0
+
+![Picture of ascii style rendering of auto-traffic-control](docs/demo/hao 0823 20220918 1403.PNG)
 
 
 

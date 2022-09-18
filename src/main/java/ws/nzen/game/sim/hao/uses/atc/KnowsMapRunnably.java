@@ -4,22 +4,11 @@
 
 package ws.nzen.game.sim.hao.uses.atc;
 
+import ws.nzen.game.sim.hao.uses.any.Quittable;
 
 /**
 
 */
-public interface ManagesGameState
+public interface KnowsMapRunnably extends KnowsMap, Runnable, Quittable
 {
-
-	public void quit(
-	);
-
-
-	public void requestGameState(
-	);
-
-
-	public void startGame(
-	);
-
 }

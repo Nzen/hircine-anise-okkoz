@@ -5,21 +5,16 @@
 package ws.nzen.game.sim.hao.uses.atc;
 
 
+import ws.nzen.game.sim.hao.game.AtcGameVersion;
+
+
 /**
 
 */
-public interface ManagesGameState
+public interface LoadsGameVersion
 {
 
-	public void quit(
-	);
-
-
-	public void requestGameState(
-	);
-
-
-	public void startGame(
+	public AtcGameVersion get(
 	);
 
 }

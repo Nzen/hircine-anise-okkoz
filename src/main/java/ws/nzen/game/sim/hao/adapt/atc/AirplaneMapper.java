@@ -49,7 +49,7 @@ public class AirplaneMapper
 				nativeAirplane.getId(),
 				flightPlan,
 				location,
-				null, // IMPROVE map should provide closest node
+				flightPlan.getRoute().get( 0 ),
 				team
 		);
 	}

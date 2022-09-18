@@ -16,7 +16,7 @@ public class PointMapper
 	public AtcMapPoint asHaoPoint(
 			Point nativePoint
 	) {
-		return new AtcMapPoint( nativePoint.getX(), nativePoint.getY() );
+		return new AtcMapPoint( -1 * nativePoint.getX(), -1 * nativePoint.getY() );
 	}
 
 }

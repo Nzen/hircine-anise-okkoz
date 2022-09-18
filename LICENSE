@@ -7,7 +7,11 @@ haokkoz relies on
 * apache tomcat annotations-api, which its authors released under Apache v2.0 license terms
 * auto-traffic-control, which its authors released under Apache v2.0 (and MIT) license terms
 * grpc-java, which the gRPC authors released under Apache v2.0 license terms
-* slf4j, which is copyright released under MIT license terms
+* java-WebSocket, which its authors released under MIT license terms
+* json:20180813, which its authors released under JSON license terms
+* maudlin honey cetyre, which its authors released under prosperity public v2.0 license terms
+* slf4j, which its authors released under MIT license terms
+* junit, which its authors released under Eclipse Public license v2.0 terms
 
 haokkoz adapted code from
 * baffled rennet lho, which its authors released under Afferoish MIT license terms
@@ -16,10 +20,9 @@ Strictly speaking, Maudlin honey cetyre's prosperity public license infects the 
 
 You can access the terms of each license in docs/third-party-licenses of this project or by visiting the corresponding documents :
 
-* Apache v2.0 license 
-* MIT license
-
-////
-* _, which is copyright _ released under _ license terms.
-////
+* Apache v2.0 license - https://www.apache.org/licenses/LICENSE-2.0.txt
+* MIT license - https://www.mit.edu/~amini/LICENSE.md
+* JSON license - http://json.org/license.html
+* Prosperity Public License - https://github.com/licensezero/prosperity-public-license
+* Eclipse Public license - 
 

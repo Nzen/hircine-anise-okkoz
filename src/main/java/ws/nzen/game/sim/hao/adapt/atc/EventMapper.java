@@ -48,7 +48,7 @@ public class EventMapper
 	}
 
 
-	public AtcEvent asHaoEvent(
+	public AtcEvent asAtcEvent(
 			StreamResponse response
 	) {
 		LocalDateTime now = LocalDateTime.now( clock );

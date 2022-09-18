@@ -1,0 +1,18 @@
+
+= Hircine Anise Okkoz Documentation
+
+== third-party-licenses
+
+Files with the text of the licenses that the dependencies used.
+
+== modules
+
+Files representing how the system is implemented.
+
+== issues
+
+Files tracking progress of particular efforts.
+
+== contributors
+
+Contributor license agreements.

@@ -48,6 +48,7 @@ public class GameServiceAdapter implements ManagesGameState, Quittable
 	@Override
 	public void quit(
 	) {
+		gameService.quit();
 		runsGameService.interrupt();
 	}
 

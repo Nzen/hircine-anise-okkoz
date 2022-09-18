@@ -1,0 +1,77 @@
+
+digraph bey1800_stoptracking_pageflow
+{
+
+/*
+*/
+	bgcolor = "#AAAAAA"
+
+	AirplaneServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for updating flight plans
+	AtcServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for game version
+	CoalesceBlobs;
+	# eventDuplicator [ color = "#AA7755" ];
+	eventServiceAdapter;
+	eventServiceEndpoint [ shape = invhouse ];
+	gameServiceAdapter;
+	gameServiceEndpoint [ shape = invhouse ];
+	HaoStarter;
+	knowsAirplanes;
+	knowsMap;
+	MapServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for node to point conversion
+	stdOutAdapter;
+	stdOutEndpoint [ shape = doubleoctagon ];
+	showsMap [ shape = doubleoctagon ];
+	color_legend;
+	grpc_endpoint [ shape = invhouse ];
+	io_endpoint [ shape = doubleoctagon ];
+
+	# [ label = "" ];
+
+	CoalesceBlobs -> stdOutAdapter [ label = "anything" ];
+
+	HaoStarter -> eventServiceAdapter [ label = "requestMoreEvents" color = "#227755" ]; # while I'd prefer a queue message, those are proprietary. maybe have a separate queue for 'requests events' that accepts a haoevent and inserts a atc/grpc request in the adapter-endpoint queue
+	HaoStarter -> gameServiceAdapter [ label = "gameStateRequests, startGameRequests" color = "#227755" ];
+
+	gameServiceAdapter -> gameServiceEndpoint [ label = "gameStateRequests, startGameRequests" ];
+
+	gameServiceEndpoint -> CoalesceBlobs [ label = "sg, gs responses" ];
+
+	eventServiceEndpoint -> eventServiceAdapter [ label = "s responses" ];
+	eventServiceEndpoint -> CoalesceBlobs [ label = "s responses" color = "red" ]; # sever this, it is a duplicate and may starve the esadapter
+
+	eventServiceAdapter -> knowsMap [ label = "gameStart" ];
+	eventServiceAdapter -> stdOutAdapter [ label = "other atcEvents" ];
+	eventServiceAdapter -> knowsAirplanes [ label = "Airplane arrived, (flightchanged)" color = "#AA7755" ];
+
+	knowsAirplanes -> showsMap [ label = "flightplan, planemoved" color = "#AA7755" ];
+
+	knowsMap -> showsMap [ label = "map saved" color = "#AA7755" ];
+	knowsMap -> knowsAirplanes [ label = "get paths" color = "#227755" ];
+
+	stdOutAdapter -> stdOutEndpoint [ label = "strings" ];
+
+	color_legend -> grpc_endpoint [ label = "queue" ];
+
+	grpc_endpoint -> io_endpoint [ label = "method call" color = "#227755" ];
+
+	io_endpoint -> color_legend [ label = "unimplemented" color = "#AA7755" ];
+
+	# ->  [ label = "" ];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

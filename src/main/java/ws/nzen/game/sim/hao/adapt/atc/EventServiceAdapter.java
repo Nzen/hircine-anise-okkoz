@@ -31,7 +31,8 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 	private final EventMapper eventMapper;
 	private final EventServiceEndpoint eventService;
 	private int millisecondsToSleep = 200;
-	private final Queue<AtcEvent> events;
+	private final Queue<AtcEvent> atcEvents;
+	private final Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected;
 	private final Queue<AtcEventGameStarted> gameStartEvents;
 	private final Queue<StreamRequest> requests;
 	private final Queue<StreamResponse> responses;
@@ -44,7 +45,8 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 			Queue<StreamRequest> forRequests,
 			Queue<StreamResponse> forResponses,
 			Queue<AtcEvent> atcEvents,
-			Queue<AtcEventGameStarted> gameStartEvents
+			Queue<AtcEventGameStarted> gameStartEvents,
+			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected
 	) {
 		if ( forRequests == null )
 			throw new NullPointerException( "forRequests must not be null" );
@@ -56,11 +58,14 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 			throw new NullPointerException( "gameStartEvents must not be null" );
 		else if ( mapper == null )
 			throw new NullPointerException( "mapper must not be null" );
+		else if ( atcEventsAirplaneDetected == null )
+			throw new NullPointerException( "atcEventsAirplaneDetected must not be null" );
 		eventService = eventStream;
 		requests = forRequests;
 		responses = forResponses;
-		events = atcEvents;
+		this.atcEvents = atcEvents;
 		this.gameStartEvents = gameStartEvents;
+		this.atcEventsAirplaneDetected = atcEventsAirplaneDetected;
 		eventMapper = mapper;
 		runsEventService = new Thread( eventService );
 		runsEventService.start();
@@ -95,11 +100,13 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 					StreamResponse response = responses.poll();
 					if ( response == null )
 						break;
-					AtcEvent event = eventMapper.asHaoEvent( response );
+					AtcEvent event = eventMapper.asAtcEvent( response );
 					if ( event.getType() == AtcEventType.GAME_STARTED )
 						gameStartEvents.offer( (AtcEventGameStarted)event );
+					else if ( event.getType() == AtcEventType.AIRPLANE_DETECTED )
+						atcEventsAirplaneDetected.offer( (AtcEventAirplaneDetected)event );
 					else
-						events.offer( event );
+						atcEvents.offer( event );
 				}
 
 				Thread.sleep( millisecondsToSleep );

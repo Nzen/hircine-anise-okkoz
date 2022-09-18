@@ -5,21 +5,35 @@
 package ws.nzen.game.sim.hao.uses.atc;
 
 
+import ws.nzen.game.sim.hao.game.AtcAirplane;
+
+
 /**
 
 */
-public interface ManagesGameState
+public interface SavesAirplanes
 {
 
-	public void quit(
-	);
-
-
-	public void requestGameState(
-	);
-
-
-	public void startGame(
+	public void save(
+			AtcAirplane airplane
 	);
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

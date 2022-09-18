@@ -10,6 +10,7 @@ import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ws.nzen.game.sim.hao.game.AtcEvent;
 import ws.nzen.game.sim.hao.uses.any.Quittable;
 import ws.nzen.game.sim.hao.uses.view.ShowsEvents;
 
@@ -23,10 +24,12 @@ public class StdOutAdapter implements ShowsEvents, Runnable, Quittable
 
 	private static final Logger log = LoggerFactory
 			.getLogger( StdOutAdapter.class );
+
 	private boolean quit = false;
 	private int millisecondsToSleep = 200;
 	private final Queue<String> messages;
-	private final Queue<? extends Object> blobs;
+	private final Queue<AtcEvent> atcEvents;
+	private final Queue<Object> blobs;
 	private final StdOutEndpoint stdout;
 	private final Thread runsStdout;
 
@@ -34,16 +37,20 @@ public class StdOutAdapter implements ShowsEvents, Runnable, Quittable
 	public StdOutAdapter(
 			StdOutEndpoint systemOutPrintln,
 			Queue<String> messageEgress,
-			Queue<? extends Object> objects
+			Queue<AtcEvent> atcEvents,
+			Queue<Object> objects
 	) {
 		if ( messageEgress == null )
-			throw new NullPointerException( "msg in must not be null" );
+			throw new NullPointerException( "messageEgress must not be null" );
 		else if ( systemOutPrintln == null )
 			throw new NullPointerException( "endpoint must not be null" );
+		else if ( atcEvents == null )
+			throw new NullPointerException( "atcEvents must not be null" );
 		else if ( objects == null )
 			throw new NullPointerException( "objects must not be null" );
 		messages = messageEgress;
 		stdout = systemOutPrintln;
+		this.atcEvents = atcEvents;
 		blobs = objects;
 		runsStdout = new Thread( stdout );
 		runsStdout.start();
@@ -66,13 +73,20 @@ public class StdOutAdapter implements ShowsEvents, Runnable, Quittable
 		{
 			while ( true )
 			{
+				while ( ! atcEvents.isEmpty() )
+				{
+					AtcEvent blob = atcEvents.poll();
+					if ( blob == null )
+						break;
+else if ( blob instanceof ws.nzen.game.sim.hao.game.AtcEventAirplaneMoved )
+	continue; // ¶ ignore deluge of airplane movement events
+					showMessage( blob );
+				}
 				while ( ! blobs.isEmpty() )
 				{
 					Object blob = blobs.poll();
 					if ( blob == null )
 						break;
-else if ( blob instanceof ws.nzen.game.sim.hao.game.AtcEventAirplaneMoved )
-	continue; // ¶ ignore deluge of airplane movement events
 					showMessage( blob );
 				}
 
