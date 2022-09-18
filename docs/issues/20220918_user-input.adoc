@@ -1,0 +1,45 @@
+
+= issue 20220918
+
+== Honor user input
+
+* assignee : Nicholas Prado
+* status : to do
+* priority : high
+
+Currently, the program operates naively.
+It runs for a fixed amount of time, independent of whether the game has ended.
+Not exiting is fine, provided there were some way to start a new game.
+Exiting after a fixed amount of time isn't really fine.
+
+Now that Haokkoz connects to a websocket, it can listen for messages about quitting and starting a game.
+
+////
+== comments
+
+=== yyMMdd hhMM zzz
+
+comment author : 
+
+comment_here
+////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
