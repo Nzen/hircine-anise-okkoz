@@ -1,5 +1,5 @@
 
-= issue yyMMdd_hhmm
+= issue yyyyMMdd_hhmm
 
 == title_here
 
