@@ -8,11 +8,13 @@
 * priority : low
 
 Ensure that this shows the game version as the game starts.
+Consider quitting or asking for confirmation, if the game version is significantly different from the expected value.
 
 ////
 == comments
+=== yyyy-MM-dd hh:MM zzz
 
-=== yyMMdd hhMM zzz
+=== --
 
 comment author : 
 

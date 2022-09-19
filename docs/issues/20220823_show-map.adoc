@@ -14,8 +14,9 @@ The latter assumes a different icon for each airplane.
 
 ////
 == comments
+=== yyyy-MM-dd hh:MM zzz
 
-=== yyMMdd hhMM zzz
+=== --
 
 comment author : 
 

@@ -16,8 +16,9 @@ Now that Haokkoz connects to a websocket, it can listen for messages about quitt
 
 ////
 == comments
+=== yyyy-MM-dd hh:MM zzz
 
-=== yyMMdd hhMM zzz
+=== --
 
 comment author : 
 

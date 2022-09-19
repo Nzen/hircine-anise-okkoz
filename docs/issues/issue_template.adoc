@@ -11,8 +11,9 @@ desc_here
 
 ////
 == comments
+=== yyyy-MM-dd hh:MM zzz
 
-=== yyMMdd hhMM zzz
+=== --
 
 comment author : 
 

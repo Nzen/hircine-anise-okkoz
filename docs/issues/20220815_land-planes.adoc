@@ -9,10 +9,13 @@
 
 Ensure that Haokkoz can land planes at their respective airports.
 
-////
 == comments
 
-=== yyMMdd hhMM zzz
+////
+== comments
+=== yyyy-MM-dd hh:MM zzz
+
+=== --
 
 comment author : 
 
