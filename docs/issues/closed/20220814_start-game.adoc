@@ -11,15 +11,13 @@ Ensure that the project can connect to a running jdno ATC game. Orienting planes
 
 Once this works, package this so it is usable to import in the original project as a 'client library'.
 
-////
 == comments
 
-=== yyMMdd hhMM zzz
+=== 2022-08-23
 
-comment author : 
+comment author : Nicholas Prado
 
-comment_here
-////
+Completed. Gifted to Jdno's https://github.com/jdno/auto-traffic-control/pull/173[Auto-Traffic-Control]
 
 
 
