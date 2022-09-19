@@ -3,7 +3,7 @@
 
 == Purpose
 
-Hircine Anise Okkoz (will eventually) plays jdno's [Auto Traffic Control](https://auto-traffic-control.com/docs) game.
+Hircine Anise Okkoz (will eventually) plays jdno's https://auto-traffic-control.com/docs[Auto Traffic Control] game.
 That is to say, it is a grpc client that connects to an ATC server and receives events (and eventually issues its own).
 
 == License
@@ -26,9 +26,9 @@ Okkoz is a latinization of numeral 4 in the Proto-Berber language.
 
 == Status
 
-0.0-alpha-3.0
+version 0.0-alpha-3.0
 
-![Picture of ascii style rendering of auto-traffic-control](docs/demo/hao 0823 20220918 1403.PNG)
+image::./docs/demo/hao 0823 20220918 1403.PNG["Picture of ascii style rendering of auto-traffic-control"]
 
 
 
