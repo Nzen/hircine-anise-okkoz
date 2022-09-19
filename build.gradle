@@ -27,15 +27,17 @@ dependencies {
 	implementation 'com.auto-traffic-control:auto-traffic-control:0.3.2'
 	implementation 'io.grpc:grpc-protobuf:1.48.1'
 	implementation 'io.grpc:grpc-stub:1.48.1'
+	implementation 'org.java-websocket:Java-WebSocket:1.4.0'
+	implementation 'org.json:json:20180813'
 	implementation 'org.slf4j:slf4j-api:1.7.25'
 	implementation 'org.slf4j:slf4j-simple:1.7.25'
-
+	implementation 'ws.nzen.game.adventure:MaudlinHoneyCetyre:5.0-SNAPSHOT'
 	testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
 }
 
 group = 'ws.nzen.game.sim.hao'
-version = '0.0-alpha-2.0'
+version = '0.0-alpha-3.0'
 description = 'Communicates with jndo Auto-Traffic-Control to guide planes'
 
 // ¶ https://github.com/diffplug/spotless/tree/main/plugin-gradle
@@ -59,7 +61,6 @@ licenseReport {
 
 // ¶ https://docs.gradle.org/current/userguide/building_java_projects.html
 java {
-	options.encoding = 'UTF-8'
 	// ¶ to require a specific jre // https://docs.gradle.org/current/userguide/toolchains.html
 	// toolchain { languageVersion = JavaLanguageVersion.of( 11 ) }
 	withSourcesJar()

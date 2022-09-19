@@ -24,6 +24,12 @@ the authors of Haokkoz release this file under the terms of the Apache license v
 
 * i20220829 prints event stream to std out
 
+== [0.0-alpha-3.0] - 2022-09-18
+
+=== Added
+
+* i20220823 shows airports and arriving airplanes
+
 ////
 == Unreleased
 
