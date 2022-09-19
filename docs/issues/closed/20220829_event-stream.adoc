@@ -10,16 +10,13 @@
 Consume the game event stream and reprint it to simple standard out.
 This ensures that we can notice airplanes arriving and start to get a sense of how often these arrive.
 
-////
 == comments
 
-=== yyMMdd hhMM zzz
+=== 2022-09-01
 
-comment author : 
+comment author : Nicholas Prado
 
-comment_here
-////
-
+Completed
 
 
 
