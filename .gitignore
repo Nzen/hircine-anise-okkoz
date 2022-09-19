@@ -9,4 +9,6 @@
 .classpath
 .project
 .settings
-/haokkoz/
+/docs/example/
+docs/journal.adoc
+docs/modules
