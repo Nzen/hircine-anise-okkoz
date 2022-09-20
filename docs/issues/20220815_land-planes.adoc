@@ -11,6 +11,19 @@ Ensure that Haokkoz can land planes at their respective airports.
 
 == comments
 
+=== 2022-09-19
+
+The effort to treat points within a distance to a particular map node should expense to this issue, rather than i20220823.
+
+Is this fast enough to ask for all the map node points ?
+Should I just put everything in a priority queue and weight based on whether an airplane is there or has a flight path in that direction ?
+What a pain that didn't need to be put on the client.
+
+.  uses/hao/ParcelMap
+.  app/service/MapsNodePixels
+.  saving new map creates a 'parcel map' message
+.  queue from mapcache to mapsnodepixels (or is it to map service ?)
+
 ////
 == comments
 === yyyy-MM-dd hh:MM zzz
