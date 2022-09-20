@@ -12,6 +12,16 @@ Retrieve the map from the game and show it in some form, to visually validate su
 Consider letting the viewing person choose the visual elements to show: flight plan, legend of airplanes.
 The latter assumes a different icon for each airplane.
 
+== comments
+
+=== 2022-09-19
+
+comment author : Nicholas Prado
+
+Shows the nodes, airports, and initial node of arriving airplanes.
+This still needs to show updated flight plans, when they change via the simulation or haokkoz.
+I'll put this on hold to work on i20220918.
+
 ////
 == comments
 === yyyy-MM-dd hh:MM zzz
