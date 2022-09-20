@@ -4,16 +4,13 @@
 
 package ws.nzen.game.sim.hao.uses.view;
 
+import ws.nzen.game.sim.hao.uses.any.Quittable;
 
 /**
 
 */
-public interface ShowsEvents extends Runnable
+public interface ShowsEvents extends Runnable, Quittable
 {
-
-	public void quit(
-	);
-
 
 	public void showMessage(
 			Object something

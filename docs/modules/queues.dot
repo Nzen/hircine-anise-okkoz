@@ -8,6 +8,8 @@ digraph bey1800_stoptracking_pageflow
 
 	AirplaneServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for updating flight plans
 	AtcServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for game version
+	CanvasAdapter;
+	CanvasEndpoint;
 	CoalesceBlobs;
 	# eventDuplicator [ color = "#AA7755" ];
 	eventServiceAdapter;
@@ -15,6 +17,7 @@ digraph bey1800_stoptracking_pageflow
 	gameServiceAdapter;
 	gameServiceEndpoint [ shape = invhouse ];
 	HaoStarter;
+	HS_GameRunner;
 	knowsAirplanes;
 	knowsMap;
 	MapServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for node to point conversion
@@ -28,6 +31,10 @@ digraph bey1800_stoptracking_pageflow
 	# [ label = "" ];
 
 	CoalesceBlobs -> stdOutAdapter [ label = "anything" ];
+
+	CanvasEndpoint -> CanvasAdapter [ label = "mhc quit" ];
+
+	CanvasAdapter -> HS_GameRunner [ label = "hao quit" ];
 
 	HaoStarter -> eventServiceAdapter [ label = "requestMoreEvents" color = "#227755" ]; # while I'd prefer a queue message, those are proprietary. maybe have a separate queue for 'requests events' that accepts a haoevent and inserts a atc/grpc request in the adapter-endpoint queue
 	HaoStarter -> gameServiceAdapter [ label = "gameStateRequests, startGameRequests" color = "#227755" ];

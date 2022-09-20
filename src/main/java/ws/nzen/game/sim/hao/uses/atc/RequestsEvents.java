@@ -5,15 +5,14 @@
 package ws.nzen.game.sim.hao.uses.atc;
 
 
+import ws.nzen.game.sim.hao.uses.any.Quittable;
+
+
 /**
 
 */
-public interface RequestsEvents extends Runnable
+public interface RequestsEvents extends Runnable, Quittable
 {
-
-	public void quit(
-	);
-
 
 	public void requestMoreEvents(
 	);

@@ -10,19 +10,26 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ws.nzen.game.adventure.mhc.HandlesInput;
+import ws.nzen.game.adventure.mhc.Keymap;
 import ws.nzen.game.adventure.mhc.message.Cell;
 import ws.nzen.game.adventure.mhc.message.ClientJsonMessage;
+import ws.nzen.game.adventure.mhc.message.Quit;
+import ws.nzen.game.adventure.mhc.message.Request;
+import ws.nzen.game.adventure.mhc.message.Type;
 import ws.nzen.game.sim.hao.game.MhcBoard;
 
 
@@ -38,12 +45,17 @@ public class CanvasEndpoint extends WebSocketServer
 	private final Logger log = LoggerFactory.getLogger( CanvasEndpoint.class );
 	private MhcBoard board = null;
 	private Map<InetSocketAddress, WebSocket> listeners = new HashMap<>();
+	private final Queue<Quit> mhcQuitOutput;
 
 
 	public CanvasEndpoint(
-			int portNumber
+			int portNumber,
+			Queue<Quit> mhcQuitOutput
 	) {
 		super( new InetSocketAddress( portNumber ) );
+		if ( mhcQuitOutput == null )
+			throw new NullPointerException( "mhcQuitOutput must not be null" );
+		this.mhcQuitOutput = mhcQuitOutput;
 	}
 
 
@@ -75,6 +87,36 @@ public class CanvasEndpoint extends WebSocketServer
 			WebSocket conn, String jsonMsg
 	) {
 		log.info( "received " + jsonMsg + " " + conn.hashCode() );
+		Keymap mhcKeymap = new Keymap();
+		String quitCharacter = mhcKeymap.getQuitKey();
+		HandlesInput mhcKeyToRequest = new HandlesInput();
+		JSONObject mapped = new JSONObject( jsonMsg );
+		if ( mapped.has( ClientJsonMessage.FLAG_TYPE ) )
+		{
+			if ( mapped.getString( ClientJsonMessage.FLAG_TYPE )
+					.equals( ClientJsonMessage.TYPE_KEY )
+					// IMPROVE store the keypress state, rather than only use keypress
+					&& mapped.getBoolean( ClientJsonMessage.KEY_F_PRESSING ) )
+			{
+				try
+				{
+					Request move = HandlesInput.fromKey(
+							mapped.getString( ClientJsonMessage.KEY_F_KCODE ),
+							mhcKeymap );
+					if ( move.type() == Type.QUIT )
+					{
+						log.info( "told to quit" );
+						conn.close();
+						mhcQuitOutput.offer( new Quit() ); // IMPROVE make this a string queue or something
+					}
+				}
+				catch ( RuntimeException re )
+				{
+					// IMPROVE ignoring invalid keys
+				}
+			}
+		}
+
 		/* JSONObject mapped = new JSONObject( jsonMsg );
 		 * if ( mapped.has( ClientJsonMessage.FLAG_TYPE ) )
 		 * {

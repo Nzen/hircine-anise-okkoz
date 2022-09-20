@@ -9,12 +9,8 @@ import ws.nzen.game.sim.hao.uses.any.Quittable;
 /**
 
 */
-public interface ShowsMap extends Runnable, Quittable
+public interface BookendsGames extends Runnable, Quittable
 {
-
-	public void updateMap(
-	);
-
 }
 
 

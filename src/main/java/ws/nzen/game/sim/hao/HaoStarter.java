@@ -20,16 +20,19 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ws.nzen.game.adventure.mhc.message.Quit;
 import ws.nzen.game.sim.hao.app.service.CoalesceBlobs;
 import ws.nzen.game.sim.hao.app.service.Factory;
 import ws.nzen.game.sim.hao.game.AtcEvent;
 import ws.nzen.game.sim.hao.game.AtcEventAirplaneDetected;
 import ws.nzen.game.sim.hao.game.AtcEventGameStarted;
 import ws.nzen.game.sim.hao.game.HaoEvent;
+import ws.nzen.game.sim.hao.uses.any.Quittable;
 import ws.nzen.game.sim.hao.uses.atc.KnowsAirplanesRunnably;
 import ws.nzen.game.sim.hao.uses.atc.KnowsMapRunnably;
 import ws.nzen.game.sim.hao.uses.atc.ManagesGameState;
 import ws.nzen.game.sim.hao.uses.atc.RequestsEvents;
+import ws.nzen.game.sim.hao.uses.view.BookendsGames;
 import ws.nzen.game.sim.hao.uses.view.ShowsEvents;
 import ws.nzen.game.sim.hao.uses.view.ShowsMap;
 
@@ -57,7 +60,9 @@ public class HaoStarter
 	private final Queue<GetGameStateRequest> gameStateRequests;
 	private final Queue<GetGameStateResponse> gameStateResponses;
 	private final Queue<HaoEvent> haoEvents;
+	private final Queue<HaoEvent> endGameEvents;
 	private final Queue<Object> anything;
+	private final Queue<Quit> mhcQuitChannel;
 	private final Queue<StartGameRequest> startGameRequests;
 	private final Queue<StartGameResponse> startGameResponses;
 	private final Queue<StreamRequest> streamRequests;
@@ -75,20 +80,20 @@ public class HaoStarter
 		anything = new ConcurrentLinkedQueue<>();
 		atcEvents = new ConcurrentLinkedQueue<>();
 		atcEventsAirplaneDetected = new ConcurrentLinkedQueue<>();
+		endGameEvents = new ConcurrentLinkedQueue<>();
 		gameStartEvents = new ConcurrentLinkedQueue<>();
 		gameStateRequests = new ConcurrentLinkedQueue<>();
 		gameStateResponses = new ConcurrentLinkedQueue<>();
 		haoEvents = new ConcurrentLinkedQueue<>();
+		mhcQuitChannel = new ConcurrentLinkedQueue<>();
 		messageForStdOut = new ConcurrentLinkedQueue<>();
 		startGameRequests = new ConcurrentLinkedQueue<>();
 		startGameResponses = new ConcurrentLinkedQueue<>();
 		streamRequests = new ConcurrentLinkedQueue<>();
 		streamResponses = new ConcurrentLinkedQueue<>();
-		CoalesceBlobs coalesceBlobs = factory.coalesceBlobs(
-				anything,
-				gameStateResponses,
-				startGameResponses );
 		threads = Executors.newCachedThreadPool();
+		GameRunner startAndQuit = new GameRunner( endGameEvents );
+		threads.execute( startAndQuit );
 		knowsAirplanes = factory.knowsAirplanesRunnably(
 				haoEvents, atcEventsAirplaneDetected );
 		threads.execute( knowsAirplanes );
@@ -109,14 +114,26 @@ public class HaoStarter
 				gameStartEvents,
 				atcEventsAirplaneDetected );
 		threads.execute( eventService );
+		CoalesceBlobs coalesceBlobs = factory.coalesceBlobs(
+				anything,
+				gameStateResponses,
+				startGameResponses );
 		threads.execute( coalesceBlobs );
 		stdOut = factory.showsEvents( messageForStdOut, atcEvents, anything );
 		threads.execute( stdOut );
 		knowsMap = factory.knowsMap( gameStartEvents, haoEvents );
 		threads.execute( knowsMap );
 		showsMap = factory.showsMap(
-				knowsAirplanes, knowsMap, haoEvents, viewPort );
+				knowsAirplanes,
+				knowsMap,
+				haoEvents,
+				endGameEvents,
+				mhcQuitChannel,
+				viewPort );
 		threads.execute( showsMap );
+		BookendsGames bookendsGames = factory.bookendsGames();
+		if ( showsMap != bookendsGames )
+			threads.execute( bookendsGames );
 	}
 
 
@@ -141,7 +158,6 @@ public class HaoStarter
 			gameService.startGame();
 			Thread.sleep( millisecondsToSleep );
 			gameService.requestGameState();
-			Thread.sleep( millisecondsToSleep * 30 );
 			quit();
 			return;
 		}
@@ -150,6 +166,64 @@ public class HaoStarter
 			log.error( ie.toString() );
 		}
 	}
+
+
+	private class GameRunner implements Runnable, Quittable
+	{
+
+		private boolean quit = false;
+		private int millisecondsToSleep = 200;
+		private final Queue<HaoEvent> endGameEvents;
+
+
+		public GameRunner(
+				Queue<HaoEvent> endGameEvents
+		) {
+			if ( endGameEvents == null )
+				throw new NullPointerException( "v must not be null" );
+			this.endGameEvents = endGameEvents;
+		}
+
+
+
+		@Override
+		public void quit(
+		) {
+			quit = true;
+			HaoStarter.this.quit();
+		}
+
+
+		@Override
+		/** Check queue for requests to print */
+		public void run(
+		) {
+			try
+			{
+				while ( true )
+				{
+					while ( ! endGameEvents.isEmpty() )
+					{
+						HaoEvent message = endGameEvents.poll();
+						if ( message == HaoEvent.END_REQUESTED )
+						{
+							quit();
+							break;
+						}
+					}
+
+					Thread.sleep( millisecondsToSleep );
+					if ( quit )
+						return;
+				}
+			}
+			catch ( InterruptedException ie )
+			{
+				log.error( ie.toString() );
+			}
+		}
+	}
+
 
 }
 

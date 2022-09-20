@@ -13,17 +13,18 @@ import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ws.nzen.game.adventure.mhc.message.Quit;
 import ws.nzen.game.sim.hao.game.*;
-import ws.nzen.game.sim.hao.uses.any.Quittable;
 import ws.nzen.game.sim.hao.uses.atc.KnowsAirplanes;
 import ws.nzen.game.sim.hao.uses.atc.KnowsMap;
+import ws.nzen.game.sim.hao.uses.view.BookendsGames;
 import ws.nzen.game.sim.hao.uses.view.ShowsMap;
 
 
 /**
 
 */
-public class CanvasAdapter implements ShowsMap, Quittable
+public class CanvasAdapter implements BookendsGames, ShowsMap
 {
 
 	private static final Logger log = LoggerFactory.getLogger( CanvasAdapter.class );
@@ -33,7 +34,9 @@ public class CanvasAdapter implements ShowsMap, Quittable
 	private final KnowsAirplanes knowsAirplanes;
 	private final KnowsMap haoMap;
 	private int millisecondsToSleep = 200;
-	private final Queue<HaoEvent> repaintEvents;
+	private final Queue<HaoEvent> repaintInput;
+	private final Queue<HaoEvent> endGameOutward;
+	private final Queue<Quit> mhcQuitInput;
 
 
 	public CanvasAdapter(
@@ -41,7 +44,9 @@ public class CanvasAdapter implements ShowsMap, Quittable
 			CanvasEndpoint canvas,
 			KnowsAirplanes knowsAirplanes,
 			KnowsMap haoMap,
-			Queue<HaoEvent> repaintEvents
+			Queue<HaoEvent> repaintInput,
+			Queue<HaoEvent> endGameOutward,
+			Queue<Quit> mhcQuitInput
 	) {
 		if ( boardMapper == null )
 			throw new NullPointerException( "boardMapper must not be null" );
@@ -51,13 +56,19 @@ public class CanvasAdapter implements ShowsMap, Quittable
 			throw new NullPointerException( "knowsAirplanes must not be null" );
 		else if ( haoMap == null )
 			throw new NullPointerException( "haoMap must not be null" );
-		else if ( repaintEvents == null )
-			throw new NullPointerException( "repaintEvents must not be null" );
+		else if ( repaintInput == null )
+			throw new NullPointerException( "repaintInput must not be null" );
+		else if ( endGameOutward == null )
+			throw new NullPointerException( "endGameOutward must not be null" );
+		else if ( mhcQuitInput == null )
+			throw new NullPointerException( "mhcQuitInput must not be null" );
 		this.boardMapper = boardMapper;
 		this.canvas = canvas;
 		this.knowsAirplanes = knowsAirplanes;
 		this.haoMap = haoMap;
-		this.repaintEvents = repaintEvents;
+		this.repaintInput = repaintInput;
+		this.endGameOutward = endGameOutward;
+		this.mhcQuitInput = mhcQuitInput;
 		canvas.start();
 	}
 
@@ -83,11 +94,21 @@ public class CanvasAdapter implements ShowsMap, Quittable
 	) {
 		try
 		{
+			mainLoop :
 			while ( true )
 			{
-				while ( ! repaintEvents.isEmpty() )
+				while ( ! mhcQuitInput.isEmpty() )
 				{
-					HaoEvent message = repaintEvents.poll();
+					Quit message = mhcQuitInput.poll();
+					log.info( message.toString() );
+					endGameOutward.offer( HaoEvent.END_REQUESTED );
+					quit();
+					break mainLoop;
+				}
+
+				while ( ! repaintInput.isEmpty() )
+				{
+					HaoEvent message = repaintInput.poll();
 					if ( message == null )
 						break;
 					updateMap();

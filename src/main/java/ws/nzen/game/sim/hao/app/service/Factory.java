@@ -12,6 +12,7 @@ import java.util.Queue;
 
 import atc.v1.Event.*;
 import atc.v1.Game.*;
+import ws.nzen.game.adventure.mhc.message.Quit;
 import ws.nzen.game.sim.hao.adapt.atc.*;
 import ws.nzen.game.sim.hao.adapt.cli.*;
 import ws.nzen.game.sim.hao.adapt.mhc.*;
@@ -27,6 +28,16 @@ public class Factory
 {
 
 	private Map<Class<?>, Object> instances = new HashMap<>();
+
+
+	public BookendsGames bookendsGames(
+	) {
+		Class<?> canvasAdapterClass = CanvasAdapter.class;
+		if ( instances.containsKey( canvasAdapterClass ) )
+			return (CanvasAdapter)instances.get( canvasAdapterClass );
+		else
+			throw new RuntimeException( "created out of order" ); // IMPROVE actually use arguments
+	}
 
 
 	public CoalesceBlobs coalesceBlobs(
@@ -131,15 +142,19 @@ public class Factory
 	public ShowsMap showsMap(
 			KnowsAirplanes knowsAirplanes,
 			KnowsMap knowsMap,
-			Queue<HaoEvent> repaintEvents,
+			Queue<HaoEvent> repaintInput,
+			Queue<HaoEvent> endGameOutward,
+			Queue<Quit> mhcQuitInput,
 			int portNumber
 	) {
 		return canvasAdapter(
 				boardMapper(),
-				canvasEndpoint( portNumber ),
+				canvasEndpoint( portNumber, mhcQuitInput ),
 				knowsAirplanes,
 				knowsMap,
-				repaintEvents );
+				repaintInput,
+				endGameOutward,
+				mhcQuitInput );
 	}
 
 
@@ -212,7 +227,9 @@ public class Factory
 			CanvasEndpoint canvasEndpoint,
 			KnowsAirplanes knowsAirplanes,
 			KnowsMap knowsMap,
-			Queue<HaoEvent> repaintEvents
+			Queue<HaoEvent> repaintInput,
+			Queue<HaoEvent> endGameOutward,
+			Queue<Quit> mhcQuitInput
 	) {
 		Class<?> canvasAdapterClass = CanvasAdapter.class;
 		if ( instances.containsKey( canvasAdapterClass ) )
@@ -224,26 +241,31 @@ public class Factory
 						canvasEndpoint,
 						knowsAirplanes,
 						knowsMap,
-						repaintEvents ) );
+						repaintInput,
+						endGameOutward,
+						mhcQuitInput ) );
 		return canvasAdapter(
 				boardMapper,
 				canvasEndpoint,
 				knowsAirplanes,
 				knowsMap,
-				repaintEvents );
+				repaintInput,
+				endGameOutward,
+				mhcQuitInput );
 	}
 
 
 	private CanvasEndpoint canvasEndpoint(
-			int portNumber
+			int portNumber,
+			Queue<Quit> mhcQuitOutput
 	) {
 		Class<?> canvasEndpointClass = CanvasEndpoint.class;
 		if ( instances.containsKey( canvasEndpointClass ) )
 			return (CanvasEndpoint)instances.get( canvasEndpointClass );
 		instances.put(
 				canvasEndpointClass,
-				new CanvasEndpoint( portNumber ) );
-		return canvasEndpoint( portNumber );
+				new CanvasEndpoint( portNumber, mhcQuitOutput ) );
+		return canvasEndpoint( portNumber, mhcQuitOutput );
 	}
 
 
