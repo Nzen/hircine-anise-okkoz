@@ -14,6 +14,28 @@ Exiting after a fixed amount of time isn't really fine.
 
 Now that Haokkoz connects to a websocket, it can listen for messages about quitting and starting a game.
 
+== comments
+
+=== 2022-09-19
+
+comment author : Nicholas Prado
+
+. uses/hao/BookendsGames ( startGame(), endClientSession() )
+. CanvasEndpoint implements BookendsGames (or do I just give it a queue ?)
+. HaoStarter.GameListener runnable can quit()
+. HaoStarter executes HS.GameListener
+. canvas endpoint 
+. canvas mapper converts mhc quit message
+. abuse an existing mhc flag to start game
+. add a new 'mhc' flag for starting game (or add it in mhc)
+
+Is it worth switching from json mhc messages to grpc ?
+Probably not, given that I'd need to rewrite the javascript to use grpc.
+Which is, like as not, more an effort to justify a 'rewrite' the mhc javascript so I can relicense that.
+Ultimately, it does not matter at all, given that I am likely the only consumer of this project, I can comply with prosperity public license, and mhc's javascript is simple enough that a rewrite result in, effectively, the same code.
+Maybe, who knows ?
+Anyway, the answer is no, but feel free to make an issue for it.
+
 ////
 == comments
 === yyyy-MM-dd hh:MM zzz
