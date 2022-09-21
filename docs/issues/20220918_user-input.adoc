@@ -36,6 +36,22 @@ Ultimately, it does not matter at all, given that I am likely the only consumer 
 Maybe, who knows ?
 Anyway, the answer is no, but feel free to make an issue for it.
 
+=== 2022-09-20
+
+comment author : Nicholas Prado
+
+. queues.dot is out of date
+. canvasadapter, not canvas endpoint should handle mapping the message, though not sure whether json message or string or request
+. factory.bookendGame() should use the same arguments as showsMap(), rather than nothing and complaining if showsMap() hasn't been run
+
+=== 2022-09-21
+
+comment author : Nicholas Prado
+
+I will remove the Adapter to Endpoint queues from HaoStarter.
+Factory can be responsible for creating these.
+I will sever any queues that stretch from an Endpoint or to an Endpoint that aren't to an adapter (ex GameServiceEndpoint to CoalesceBlobs).
+
 ////
 == comments
 === yyyy-MM-dd hh:MM zzz
