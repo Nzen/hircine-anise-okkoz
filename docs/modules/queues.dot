@@ -6,64 +6,121 @@ digraph bey1800_stoptracking_pageflow
 */
 	bgcolor = "#AAAAAA"
 
-	AirplaneServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for updating flight plans
-	AtcServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for game version
-	CanvasAdapter;
-	CanvasEndpoint;
-	CoalesceBlobs;
-	# eventDuplicator [ color = "#AA7755" ];
-	eventServiceAdapter;
-	eventServiceEndpoint [ shape = invhouse ];
-	gameServiceAdapter;
-	gameServiceEndpoint [ shape = invhouse ];
+	{
+		rank = same;
+		AtcServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for game version
+		AirplaneServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for updating flight plans
+		MapServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for node to point conversion
+		eventServiceEndpoint [ shape = invhouse ];
+		gameServiceEndpoint [ shape = invhouse ];
+	}
+
+	{
+		rank = same;
+		stdOutEndpoint [ shape = doubleoctagon ];
+		CanvasEndpoint [ shape = doubleoctagon ];
+	}
+
+	{
+		rank = same;
+		AirplaneServiceAdapter [ color = "#AA7755" ];
+		AtcServiceAdapter [ color = "#AA7755" ];
+		eventServiceAdapter;
+		gameServiceAdapter;
+		MapServiceAdapter [ color = "#AA7755" ];
+	}
+
+	{
+		rank = same;
+		CanvasAdapter;
+		stdOutAdapter;
+	}
+
+	{
+		rank = same;
+		CoalesceBlobs;
+		knowsAirplanes [ label = "kA (AirplaneDispatch)" ];
+		knowsMap [ label = "kM (MapDispatch)" ];
+		SchedulesFlights [ color = "#AA7755" ];
+		ZonesMap [ color = "#AA7755" ];
+	}
+
 	HaoStarter;
 	HS_GameRunner;
-	knowsAirplanes;
-	knowsMap;
-	MapServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for node to point conversion
-	stdOutAdapter;
-	stdOutEndpoint [ shape = doubleoctagon ];
-	showsMap [ shape = doubleoctagon ];
-	color_legend;
-	grpc_endpoint [ shape = invhouse ];
-	io_endpoint [ shape = doubleoctagon ];
 
 	# [ label = "" ];
+
+	AirplaneServiceAdapter -> AirplaneServiceEndpoint [ label = "path requests" color = "#AA7755" ];
+
+	AirplaneServiceEndpoint -> AirplaneServiceAdapter [ label = "path responses" color = "#AA7755" ];
+
+	AtcServiceAdapter -> AtcServiceEndpoint [ label = "game version requests" color = "#AA7755" ];
+	AtcServiceAdapter -> HS_GameRunner [ label = "game version" color = "#AA7755" ];
+
+	AtcServiceEndpoint -> AtcServiceAdapter [ label = "game version responses" color = "#AA7755" ];
 
 	CoalesceBlobs -> stdOutAdapter [ label = "anything" ];
 
 	CanvasEndpoint -> CanvasAdapter [ label = "mhc quit" ];
 
-	CanvasAdapter -> HS_GameRunner [ label = "hao quit" ];
+	CanvasAdapter -> CanvasEndpoint [ label = "mhc map" ];
+	CanvasAdapter -> HS_GameRunner [ label = "hao quit (startGame)" ];
 
-	HaoStarter -> eventServiceAdapter [ label = "requestMoreEvents" color = "#227755" ]; # while I'd prefer a queue message, those are proprietary. maybe have a separate queue for 'requests events' that accepts a haoevent and inserts a atc/grpc request in the adapter-endpoint queue
-	HaoStarter -> gameServiceAdapter [ label = "gameStateRequests, startGameRequests" color = "#227755" ];
-
-	gameServiceAdapter -> gameServiceEndpoint [ label = "gameStateRequests, startGameRequests" ];
-
-	gameServiceEndpoint -> CoalesceBlobs [ label = "sg, gs responses" ];
-
-	eventServiceEndpoint -> eventServiceAdapter [ label = "s responses" ];
-	eventServiceEndpoint -> CoalesceBlobs [ label = "s responses" color = "red" ]; # sever this, it is a duplicate and may starve the esadapter
-
+	eventServiceAdapter -> eventServiceEndpoint [ label = "stream request" ];
 	eventServiceAdapter -> knowsMap [ label = "gameStart" ];
 	eventServiceAdapter -> stdOutAdapter [ label = "other atcEvents" ];
 	eventServiceAdapter -> knowsAirplanes [ label = "Airplane arrived, (flightchanged)" color = "#AA7755" ];
 
-	knowsAirplanes -> showsMap [ label = "flightplan, planemoved" color = "#AA7755" ];
+	eventServiceEndpoint -> eventServiceAdapter [ label = "s responses" ];
 
-	knowsMap -> showsMap [ label = "map saved" color = "#AA7755" ];
-	knowsMap -> knowsAirplanes [ label = "get paths" color = "#227755" ];
+	HaoStarter -> eventServiceAdapter [ label = "requestMoreEvents" color = "red" ];
+	HaoStarter -> gameServiceAdapter [ label = "gState, startG" color = "red" ];
+	HaoStarter -> HS_GameRunner [ label = "init" color = "#AA7755" ];
+
+	HS_GameRunner -> AtcServiceAdapter [ label = "request version" color = "#AA7755" ];
+	HS_GameRunner -> gameServiceAdapter [ label = "start game" color = "#AA7755" ];
+	HS_GameRunner -> HaoStarter [ label = "hao quit" ];
+	HS_GameRunner -> eventServiceAdapter [ label = "requestMoreEvents" color = "#AA7755" ];
+
+	gameServiceAdapter -> gameServiceEndpoint [ label = "gState, startG" ];
+
+	gameServiceEndpoint -> CoalesceBlobs [ label = "sg, gs response" color = "red" ];
+	gameServiceEndpoint -> gameServiceAdapter [ label = "sg gs response" ];
+
+	knowsAirplanes -> CanvasAdapter [ label = "(flightplan) (planemoved) arrived" ];
+	knowsAirplanes -> SchedulesFlights [ label = "arrived" color = "#AA7755" ];
+	knowsAirplanes -> ZonesMap [ label = "arrived" color = "#AA7755" ];
+
+	knowsMap -> CanvasAdapter [ label = "map saved" color = "#AA7755" ];
+	knowsMap -> knowsAirplanes [ label = "get paths" color = "#AA7755" ];
+
+	MapServiceAdapter -> MapServiceEndpoint [ label = "node-point requests" color = "#AA7755" ];
+	MapServiceAdapter -> ZonesMap [ label = "node-point" color = "#AA7755" ];
+
+	MapServiceEndpoint -> MapServiceAdapter [ label = "node-point responses" color = "#AA7755" ];
+
+	SchedulesFlights -> AirplaneServiceAdapter [ label = "get paths" color = "#AA7755" ];
 
 	stdOutAdapter -> stdOutEndpoint [ label = "strings" ];
 
-	color_legend -> grpc_endpoint [ label = "queue" ];
-
-	grpc_endpoint -> io_endpoint [ label = "method call" color = "#227755" ];
-
-	io_endpoint -> color_legend [ label = "unimplemented" color = "#AA7755" ];
+	ZonesMap -> MapServiceAdapter [ label = "get nodepoint" color = "#AA7755" ];
+	ZonesMap -> knowsMap [ label = "node zone" color = "#AA7755" ];
 
 	# ->  [ label = "" ];
+
+	subgraph cluster0 {
+		color_legend [ label = "color and symbol legend" ];
+		submodule;
+		grpc_endpoint [ shape = invhouse ];
+		io_endpoint [ shape = doubleoctagon ];
+
+		submodule -> grpc_endpoint [ label = "queue" ];
+
+		grpc_endpoint -> io_endpoint [ label = "method call" color = "#227755" ];
+		grpc_endpoint -> submodule [ label = "remove" color = "red" ];
+
+		io_endpoint -> submodule [ label = "unimplemented" color = "#AA7755" ];
+	}
 }
 
 
