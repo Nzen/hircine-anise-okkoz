@@ -1,4 +1,8 @@
 
+////
+The authors of Haokkoz release this file under Apache v2.0 license terms.
+////
+
 = # Template for architecture decision records
 
 Status : 
