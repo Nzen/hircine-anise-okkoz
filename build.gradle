@@ -107,19 +107,19 @@ task run_( type: JavaExec ) {
 // ¶ signs jar file with keystore certificate
 task jsin( type:Exec, dependsOn: jar ) {
 	workingDir project.projectDir
-	commandLine project.jarsigner,
+	commandLine project.js_jarsigner,
 			// '-verbose',
-			'-keystore', project.keyStore,
-			'-storepass', project.keyStorePass,
-			'-keypass', project.keyStoreKeyPass,
-			'-tsa', project.tsa,
+			'-keystore', project.js_keyStore,
+			'-storepass', project.js_keyStorePass,
+			'-keypass', project.js_keyStoreKeyPass,
+			'-tsa', project.js_tsa,
 			'build/libs/'+ project.name +'-'+ project.version +'.jar',
-			project.keyStoreAlias
+			project.js_keyStoreAlias
 }
 
 task jvify( type:Exec, dependsOn: jar ) {
 	workingDir project.projectDir
-	commandLine project.jarsigner,
+	commandLine project.js_jarsigner,
 			// '-verbose',
 			'-verify',
 			'build/libs/'+ project.name +'-'+ project.version +'.jar'
