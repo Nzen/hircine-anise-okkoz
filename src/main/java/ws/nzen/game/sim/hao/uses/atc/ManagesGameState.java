@@ -8,7 +8,7 @@ package ws.nzen.game.sim.hao.uses.atc;
 /**
 
 */
-public interface ManagesGameState
+public interface ManagesGameState extends Runnable
 {
 
 	public void quit(
@@ -16,10 +16,6 @@ public interface ManagesGameState
 
 
 	public void requestGameState(
-	);
-
-
-	public void startGame(
 	);
 
 }

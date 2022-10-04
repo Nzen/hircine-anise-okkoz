@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import atc.v1.Event.*;
 import atc.v1.Game.*;
@@ -31,33 +32,21 @@ public class Factory
 
 
 	public BookendsGames bookendsGames(
+			KnowsAirplanes knowsAirplanes,
+			KnowsMap knowsMap,
+			Queue<HaoEvent> repaintInput,
+			Queue<HaoEvent> endGameOutward,
+			Queue<Quit> mhcQuitInput,
+			int portNumber
 	) {
-		Class<?> canvasAdapterClass = CanvasAdapter.class;
-		if ( instances.containsKey( canvasAdapterClass ) )
-			return (CanvasAdapter)instances.get( canvasAdapterClass );
-		else
-			throw new RuntimeException( "created out of order" ); // IMPROVE actually use arguments
-	}
-
-
-	public CoalesceBlobs coalesceBlobs(
-			Queue<Object> outwardQueue,
-			Queue<GetGameStateResponse> gameStateResponses,
-			Queue<StartGameResponse> startGameResponses
-	) {
-		Class<?> stdOutAdapterClass = CoalesceBlobs.class;
-		if ( instances.containsKey( stdOutAdapterClass ) )
-			return (CoalesceBlobs)instances.get( stdOutAdapterClass );
-		instances.put(
-				stdOutAdapterClass,
-				new CoalesceBlobs(
-						outwardQueue,
-						gameStateResponses,
-						startGameResponses ) );
-		return coalesceBlobs(
-				outwardQueue,
-				gameStateResponses,
-				startGameResponses );
+		return canvasAdapter(
+				boardMapper(),
+				canvasEndpoint( portNumber, mhcQuitInput ),
+				knowsAirplanes,
+				knowsMap,
+				repaintInput,
+				endGameOutward,
+				mhcQuitInput );
 	}
 
 
@@ -82,21 +71,25 @@ public class Factory
 	public ManagesGameState managesGameState(
 			String host,
 			int port,
-			Queue<GetGameStateRequest> forGameStateRequests,
-			Queue<GetGameStateResponse> forGameStateResponses,
-			Queue<StartGameRequest> forStartGameRequests,
-			Queue<StartGameResponse> forStartGameResponses
+			Queue<HaoMessage> haoGameStartRequests
 	) {
+		Queue<GetGameStateRequest> grpcGameStateRequests = new ConcurrentLinkedQueue<>();
+		Queue<GetGameStateResponse> grpcGameStateResponses = new ConcurrentLinkedQueue<>();
+		Queue<StartGameRequest> grpcStartGameRequests = new ConcurrentLinkedQueue<>();
+		Queue<StartGameResponse> grpcStartGameResponses = new ConcurrentLinkedQueue<>();
 		return gameServiceAdapter(
 				gameServiceEndpoint(
 						host,
 						port,
-						forGameStateRequests,
-						forGameStateResponses,
-						forStartGameRequests,
-						forStartGameResponses ),
-				forGameStateRequests,
-				forStartGameRequests
+						grpcGameStateRequests,
+						grpcGameStateResponses,
+						grpcStartGameRequests,
+						grpcStartGameResponses ),
+				grpcGameStateRequests,
+				grpcGameStateResponses,
+				grpcStartGameRequests,
+				grpcStartGameResponses,
+				haoGameStartRequests
 		);
 	}
 
@@ -345,7 +338,10 @@ public class Factory
 	private GameServiceAdapter gameServiceAdapter(
 			GameServiceEndpoint endpoint,
 			Queue<GetGameStateRequest> forGameStateRequests,
-			Queue<StartGameRequest> forStartGameRequests
+			Queue<GetGameStateResponse> forGameStateResponses,
+			Queue<StartGameRequest> forStartGameRequests,
+			Queue<StartGameResponse> forStartGameResponses,
+			Queue<HaoMessage> haoGameStartRequests
 	) {
 		Class<?> gameServiceAdapterClass = GameServiceAdapter.class;
 		if ( instances.containsKey( gameServiceAdapterClass ) )
@@ -355,11 +351,17 @@ public class Factory
 				new GameServiceAdapter(
 						endpoint,
 						forGameStateRequests,
-						forStartGameRequests ) );
+						forGameStateResponses,
+						forStartGameRequests,
+						forStartGameResponses,
+						haoGameStartRequests ) );
 		return gameServiceAdapter(
 				endpoint,
 				forGameStateRequests,
-				forStartGameRequests );
+				forGameStateResponses,
+				forStartGameRequests,
+				forStartGameResponses,
+				haoGameStartRequests );
 	}
 
 
