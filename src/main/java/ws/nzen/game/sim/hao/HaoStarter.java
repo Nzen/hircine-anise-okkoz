@@ -16,7 +16,6 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ws.nzen.game.adventure.mhc.message.Quit;
 import ws.nzen.game.sim.hao.app.service.Factory;
 import ws.nzen.game.sim.hao.game.AtcEvent;
 import ws.nzen.game.sim.hao.game.AtcEventAirplaneDetected;
@@ -51,17 +50,6 @@ public class HaoStarter
 	private final KnowsAirplanesRunnably knowsAirplanes;
 	private final KnowsMapRunnably knowsMap;
 	private final ManagesGameState gameService;
-	private final Queue<AtcEvent> atcEvents;
-	private final Queue<AtcEventGameStarted> gameStartEvents;
-	private final Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected;
-	private final Queue<HaoEvent> haoEvents;
-	private final Queue<HaoEvent> endGameEvents;
-	private final Queue<HaoMessage> haoGameStartRequests;
-	private final Queue<Object> anything;
-	private final Queue<Quit> mhcQuitChannel;
-	private final Queue<StreamRequest> streamRequests;
-	private final Queue<StreamResponse> streamResponses;
-	private final Queue<String> messageForStdOut;
 	private final RequestsEvents eventService;
 	private final ShowsEvents stdOut;
 	private final ShowsMap showsMap;
@@ -71,55 +59,31 @@ public class HaoStarter
 			String host, int atcPort, int viewPort
 	) {
 		Factory factory = new Factory();
-		anything = new ConcurrentLinkedQueue<>();
-		atcEvents = new ConcurrentLinkedQueue<>();
-		atcEventsAirplaneDetected = new ConcurrentLinkedQueue<>();
-		endGameEvents = new ConcurrentLinkedQueue<>();
-		gameStartEvents = new ConcurrentLinkedQueue<>();
-		haoEvents = new ConcurrentLinkedQueue<>();
-		mhcQuitChannel = new ConcurrentLinkedQueue<>();
-		messageForStdOut = new ConcurrentLinkedQueue<>();
-		haoGameStartRequests = new ConcurrentLinkedQueue<>();
-		streamRequests = new ConcurrentLinkedQueue<>();
-		streamResponses = new ConcurrentLinkedQueue<>();
 		threads = Executors.newCachedThreadPool();
-		startAndQuit = new GameRunner( endGameEvents, haoGameStartRequests );
+		startAndQuit = new GameRunner( factory.queueHaoEventEndGame(), factory.queueHaoMessageStartGame() );
 		threads.execute( startAndQuit );
-		knowsAirplanes = factory.knowsAirplanesRunnably(
-				haoEvents, atcEventsAirplaneDetected );
+		knowsAirplanes = factory.knowsAirplanesRunnably();
 		threads.execute( knowsAirplanes );
 		gameService = factory.managesGameState(
 				host,
-				atcPort,
-				haoGameStartRequests );
+				atcPort );
 		threads.execute( gameService );
 		eventService = factory.requestsEvents(
 				host,
-				atcPort,
-				streamRequests,
-				streamResponses,
-				atcEvents,
-				gameStartEvents,
-				atcEventsAirplaneDetected );
+				atcPort );
 		threads.execute( eventService );
-		stdOut = factory.showsEvents( messageForStdOut, atcEvents, anything );
+		stdOut = factory.showsEvents();
 		threads.execute( stdOut );
-		knowsMap = factory.knowsMap( gameStartEvents, haoEvents );
+		knowsMap = factory.knowsMap();
 		threads.execute( knowsMap );
 		showsMap = factory.showsMap(
 				knowsAirplanes,
 				knowsMap,
-				haoEvents,
-				endGameEvents,
-				mhcQuitChannel,
 				viewPort );
 		threads.execute( showsMap );
 		BookendsGames bookendsGames = factory.bookendsGames(
 				knowsAirplanes,
 				knowsMap,
-				haoEvents,
-				endGameEvents,
-				mhcQuitChannel,
 				viewPort );
 		if ( showsMap != bookendsGames )
 			threads.execute( bookendsGames );
@@ -218,10 +182,17 @@ public class HaoStarter
 		}
 
 
+		void init(
+		) {
+			// eventService.requestMoreEvents(); // use a queue instead
+		}
+
+
 		void start(
 		) {
 			haoGameStartRequests.offer( HaoMessage.START_GAME );
 		}
+
 	}
 
 

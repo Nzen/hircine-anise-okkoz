@@ -24,15 +24,15 @@ public class AirplaneCache implements KnowsAirplanes, SavesAirplanes
 {
 
 	private Map<String, AtcAirplane> airplanes = new HashMap<>();
-	private final Queue<HaoEvent> repaintEvents;
+	private final Queue<HaoEvent> repaintEventsOutward;
 
 
 	public AirplaneCache(
-			Queue<HaoEvent> repaintEvents
+			Queue<HaoEvent> repaintEventsOutward
 	) {
-		if ( repaintEvents == null )
-			throw new NullPointerException( "repaintEvents must not be null" );
-		this.repaintEvents = repaintEvents;
+		if ( repaintEventsOutward == null )
+			throw new NullPointerException( "repaintEventsOutward must not be null" );
+		this.repaintEventsOutward = repaintEventsOutward;
 	}
 
 
@@ -58,7 +58,7 @@ public class AirplaneCache implements KnowsAirplanes, SavesAirplanes
 		if ( airplane == null )
 			throw new NullPointerException( "airplane must not be null" );
 		airplanes.put( airplane.getAtcId(), airplane );
-		repaintEvents.offer( HaoEvent.FLIGHT_PLAN_CHANGED );
+		repaintEventsOutward.offer( HaoEvent.FLIGHT_PLAN_CHANGED );
 	}
 
 

@@ -29,7 +29,6 @@ public class StdOutAdapter implements ShowsEvents, Runnable, Quittable
 	private int millisecondsToSleep = 200;
 	private final Queue<String> messages;
 	private final Queue<AtcEvent> atcEvents;
-	private final Queue<Object> blobs;
 	private final StdOutEndpoint stdout;
 	private final Thread runsStdout;
 
@@ -37,8 +36,7 @@ public class StdOutAdapter implements ShowsEvents, Runnable, Quittable
 	public StdOutAdapter(
 			StdOutEndpoint systemOutPrintln,
 			Queue<String> messageEgress,
-			Queue<AtcEvent> atcEvents,
-			Queue<Object> objects
+			Queue<AtcEvent> atcEvents
 	) {
 		if ( messageEgress == null )
 			throw new NullPointerException( "messageEgress must not be null" );
@@ -46,12 +44,9 @@ public class StdOutAdapter implements ShowsEvents, Runnable, Quittable
 			throw new NullPointerException( "endpoint must not be null" );
 		else if ( atcEvents == null )
 			throw new NullPointerException( "atcEvents must not be null" );
-		else if ( objects == null )
-			throw new NullPointerException( "objects must not be null" );
 		messages = messageEgress;
 		stdout = systemOutPrintln;
 		this.atcEvents = atcEvents;
-		blobs = objects;
 		runsStdout = new Thread( stdout );
 		runsStdout.start();
 	}
@@ -80,13 +75,6 @@ public class StdOutAdapter implements ShowsEvents, Runnable, Quittable
 						break;
 else if ( blob instanceof ws.nzen.game.sim.hao.game.AtcEventAirplaneMoved )
 	continue; // ¶ ignore deluge of airplane movement events
-					showMessage( blob );
-				}
-				while ( ! blobs.isEmpty() )
-				{
-					Object blob = blobs.poll();
-					if ( blob == null )
-						break;
 					showMessage( blob );
 				}
 

@@ -23,131 +23,259 @@ import ws.nzen.game.sim.hao.uses.view.*;
 
 
 /**
-
+Creates (singletons) of anything.
 */
+@SuppressWarnings( value="unchecked" )
 public class Factory
 {
 
-	private Map<Class<?>, Object> instances = new HashMap<>();
+	private final Map<Class<?>, Object> instances = new HashMap<>();
+	private final Map<String, Queue<?>> queues = new HashMap<>();
 
 
 	public BookendsGames bookendsGames(
 			KnowsAirplanes knowsAirplanes,
 			KnowsMap knowsMap,
-			Queue<HaoEvent> repaintInput,
-			Queue<HaoEvent> endGameOutward,
-			Queue<Quit> mhcQuitInput,
 			int portNumber
 	) {
 		return canvasAdapter(
 				boardMapper(),
-				canvasEndpoint( portNumber, mhcQuitInput ),
+				canvasEndpoint( portNumber, queueCanvasQuit() ),
 				knowsAirplanes,
 				knowsMap,
-				repaintInput,
-				endGameOutward,
-				mhcQuitInput );
+				queueRepaintHaoEvent(),
+				queueHaoEventEndGame(),
+				queueHaoMessageStartGame(),
+				queueCanvasStart(),
+				queueCanvasQuit() );
 	}
 
 
 	public KnowsAirplanesRunnably knowsAirplanesRunnably(
-			Queue<HaoEvent> repaintEvents,
-			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected
 	) {
 		return airplaneDispatch(
-				airplaneCache( repaintEvents ),
-				atcEventsAirplaneDetected );
+				airplaneCache( queueRepaintHaoEvent() ),
+				queueAtcEventAirplaneDetected() );
 	}
 
 
 	public KnowsMapRunnably knowsMap(
-			Queue<AtcEventGameStarted> events,
-			Queue<HaoEvent> repaintEvents
 	) {
-		return mapDispatch( events, repaintEvents );
+		return mapDispatch( queueAtcEventGameStarted(), queueRepaintHaoEvent() );
 	}
 
 
 	public ManagesGameState managesGameState(
 			String host,
-			int port,
-			Queue<HaoMessage> haoGameStartRequests
+			int port
 	) {
-		Queue<GetGameStateRequest> grpcGameStateRequests = new ConcurrentLinkedQueue<>();
-		Queue<GetGameStateResponse> grpcGameStateResponses = new ConcurrentLinkedQueue<>();
-		Queue<StartGameRequest> grpcStartGameRequests = new ConcurrentLinkedQueue<>();
-		Queue<StartGameResponse> grpcStartGameResponses = new ConcurrentLinkedQueue<>();
 		return gameServiceAdapter(
 				gameServiceEndpoint(
 						host,
 						port,
-						grpcGameStateRequests,
-						grpcGameStateResponses,
-						grpcStartGameRequests,
-						grpcStartGameResponses ),
-				grpcGameStateRequests,
-				grpcGameStateResponses,
-				grpcStartGameRequests,
-				grpcStartGameResponses,
-				haoGameStartRequests
+						queueGetGameStateRequest(),
+						queueGetGameStateResponse(),
+						queueStartGameRequest(),
+						queueStartGameResponse() ),
+				queueGetGameStateRequest(),
+				queueGetGameStateResponse(),
+				queueStartGameRequest(),
+				queueStartGameResponse(),
+				queueHaoMessageStartGame()
 		);
 	}
 
 
+	public Queue<Quit> queueCanvasQuit(
+	) {
+		final String nameCanvasQuit = "queueCanvasQuit";
+		if ( ! queues.containsKey( nameCanvasQuit ) )
+			queues.put( nameCanvasQuit, new ConcurrentLinkedQueue<>() );
+		return (Queue<Quit>)queues.get( nameCanvasQuit );
+	}
+
+
+	public Queue<MhcMessage> queueCanvasStart(
+	) {
+		final String nameCanvasStart = "queueCanvasStart";
+		if ( ! queues.containsKey( nameCanvasStart ) )
+			queues.put( nameCanvasStart, new ConcurrentLinkedQueue<>() );
+		return (Queue<MhcMessage>)queues.get( nameCanvasStart );
+	}
+
+
+	public Queue<GetGameStateRequest> queueGetGameStateRequest(
+	) {
+		final String nameGetGameStateRequest = "queueGetGameStateRequest";
+		if ( ! queues.containsKey( nameGetGameStateRequest ) )
+			queues.put( nameGetGameStateRequest, new ConcurrentLinkedQueue<>() );
+		return (Queue<GetGameStateRequest>)queues.get( nameGetGameStateRequest );
+	}
+
+
+	public Queue<GetGameStateResponse> queueGetGameStateResponse(
+	) {
+		final String nameGetGameStateResponse = "queueGetGameStateResponse";
+		if ( ! queues.containsKey( nameGetGameStateResponse ) )
+			queues.put( nameGetGameStateResponse, new ConcurrentLinkedQueue<>() );
+		return (Queue<GetGameStateResponse>)queues.get( nameGetGameStateResponse );
+	}
+
+
+	public Queue<StartGameRequest> queueStartGameRequest(
+	) {
+		final String nameStartGameRequest = "queueStartGameRequest";
+		if ( ! queues.containsKey( nameStartGameRequest ) )
+			queues.put( nameStartGameRequest, new ConcurrentLinkedQueue<>() );
+		return (Queue<StartGameRequest>)queues.get( nameStartGameRequest );
+	}
+
+
+	public Queue<StartGameResponse> queueStartGameResponse(
+	) {
+		final String nameStartGameResponse = "queueStartGameResponse";
+		if ( ! queues.containsKey( nameStartGameResponse ) )
+			queues.put( nameStartGameResponse, new ConcurrentLinkedQueue<>() );
+		return (Queue<StartGameResponse>)queues.get( nameStartGameResponse );
+	}
+
+
+	public Queue<StreamRequest> queueStreamRequest(
+	) {
+		final String name = "queueStreamRequest";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<StreamRequest>)queues.get( name );
+	}
+
+
+	public Queue<StreamResponse> queueStreamResponse(
+	) {
+		final String name = "queueStreamResponse";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<StreamResponse>)queues.get( name );
+	}
+
+
+	public Queue<String> queueString(
+	) {
+		final String name = "queueString";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<String>)queues.get( name );
+	}
+
+
+	public Queue<AtcEvent> queueOtherAtcEvent(
+	) {
+		final String name = "queueOtherAtcEvent";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<AtcEvent>)queues.get( name );
+	}
+
+
+	public Queue<HaoEvent> queueRepaintHaoEvent(
+	) {
+		final String name = "queueRepaintHaoEvent";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<HaoEvent>)queues.get( name );
+	}
+
+
+	public Queue<AtcEventGameStarted> queueAtcEventGameStarted(
+	) {
+		final String name = "queueAtcEventGameStarted";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<AtcEventGameStarted>)queues.get( name );
+	}
+
+
+	public Queue<AtcEventAirplaneDetected> queueAtcEventAirplaneDetected(
+	) {
+		final String name = "queueAtcEventAirplaneDetected";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<AtcEventAirplaneDetected>)queues.get( name );
+	}
+
+
+	public Queue<HaoEvent> queueHaoEventEndGame(
+	) {
+		final String name = "queueHaoEventEndGame";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<HaoEvent>)queues.get( name );
+	}
+
+
+	public Queue<HaoMessage> queueHaoMessageStartGame(
+	) {
+		final String name = "queueHaoMessageStartGame";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<HaoMessage>)queues.get( name );
+	}
+/*
+
+
+	public Queue<> queue(
+	) {
+		final String name = "queue";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<>)queues.get( name );
+	}
+*/
+
+
 	public RequestsEvents requestsEvents(
 			String host,
-			int port,
-			Queue<StreamRequest> forRequests,
-			Queue<StreamResponse> forResponses,
-			Queue<AtcEvent> atcEvents,
-			Queue<AtcEventGameStarted> gameStartEvents,
-			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected
+			int port
 	) {
 		return eventServiceAdapter(
 				eventServiceEndpoint(
 						host,
 						port,
-						forRequests,
-						forResponses ),
+						queueStreamRequest(),
+						queueStreamResponse() ),
 				eventMapper(),
-				forRequests,
-				forResponses,
-				atcEvents,
-				gameStartEvents,
-				atcEventsAirplaneDetected
+				queueStreamRequest(),
+				queueStreamResponse(),
+				queueOtherAtcEvent(),
+				queueAtcEventGameStarted(),
+				queueAtcEventAirplaneDetected()
 		);
 	}
 
 
 	public ShowsEvents showsEvents(
-			Queue<String> messageIngress,
-			Queue<AtcEvent> atcEvents,
-			Queue<Object> blobIngress
 	) {
 		return stdOutAdapter(
-				stdOutEndpoint( messageIngress ),
-				messageIngress,
-				atcEvents,
-				blobIngress );
+				stdOutEndpoint( queueString() ),
+				queueString(),
+				queueOtherAtcEvent() );
 	}
 
 
 	public ShowsMap showsMap(
 			KnowsAirplanes knowsAirplanes,
 			KnowsMap knowsMap,
-			Queue<HaoEvent> repaintInput,
-			Queue<HaoEvent> endGameOutward,
-			Queue<Quit> mhcQuitInput,
 			int portNumber
 	) {
 		return canvasAdapter(
 				boardMapper(),
-				canvasEndpoint( portNumber, mhcQuitInput ),
+				canvasEndpoint( portNumber, queueCanvasQuit() ),
 				knowsAirplanes,
 				knowsMap,
-				repaintInput,
-				endGameOutward,
-				mhcQuitInput );
+				queueRepaintHaoEvent(),
+				queueHaoEventEndGame(),
+				queueHaoMessageStartGame(),
+				queueCanvasStart(),
+				queueCanvasQuit() );
 	}
 
 
@@ -222,6 +350,8 @@ public class Factory
 			KnowsMap knowsMap,
 			Queue<HaoEvent> repaintInput,
 			Queue<HaoEvent> endGameOutward,
+			Queue<HaoMessage> startGameOutward,
+			Queue<MhcMessage> startGameMhc,
 			Queue<Quit> mhcQuitInput
 	) {
 		Class<?> canvasAdapterClass = CanvasAdapter.class;
@@ -236,6 +366,8 @@ public class Factory
 						knowsMap,
 						repaintInput,
 						endGameOutward,
+						startGameOutward,
+						startGameMhc,
 						mhcQuitInput ) );
 		return canvasAdapter(
 				boardMapper,
@@ -244,6 +376,8 @@ public class Factory
 				knowsMap,
 				repaintInput,
 				endGameOutward,
+				startGameOutward,
+				startGameMhc,
 				mhcQuitInput );
 	}
 
@@ -469,8 +603,7 @@ public class Factory
 	private StdOutAdapter stdOutAdapter(
 			StdOutEndpoint stdOutEndpoint,
 			Queue<String> messageIngress,
-			Queue<AtcEvent> atcEvents,
-			Queue<Object> blobIngress
+			Queue<AtcEvent> atcEvents
 	) {
 		Class<?> stdOutAdapterClass = StdOutAdapter.class;
 		if ( instances.containsKey( stdOutAdapterClass ) )
@@ -480,13 +613,11 @@ public class Factory
 				new StdOutAdapter(
 						stdOutEndpoint,
 						messageIngress,
-						atcEvents,
-						blobIngress ) );
+						atcEvents ) );
 		return stdOutAdapter(
 				stdOutEndpoint,
 				messageIngress,
-				atcEvents,
-				blobIngress );
+				atcEvents );
 	}
 
 

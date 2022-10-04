@@ -38,7 +38,6 @@ digraph haokkoz_data_flow
 
 	{
 		rank = same;
-		CoalesceBlobs;
 		knowsAirplanes [ label = "kA (AirplaneDispatch)" ];
 		knowsMap [ label = "kM (MapDispatch)" ];
 		SchedulesFlights [ color = "#AA7755" ];
@@ -59,8 +58,6 @@ digraph haokkoz_data_flow
 
 	AtcServiceEndpoint -> AtcServiceAdapter [ label = "game version responses" color = "#AA7755" ];
 
-	CoalesceBlobs -> stdOutAdapter [ label = "anything" ];
-
 	CanvasEndpoint -> CanvasAdapter [ label = "mhc quit" ];
 
 	CanvasAdapter -> CanvasEndpoint [ label = "mhc map" ];
@@ -74,17 +71,15 @@ digraph haokkoz_data_flow
 	eventServiceEndpoint -> eventServiceAdapter [ label = "s responses" ];
 
 	HaoStarter -> eventServiceAdapter [ label = "requestMoreEvents" color = "red" ];
-	HaoStarter -> gameServiceAdapter [ label = "gState, startG" color = "red" ];
-	HaoStarter -> HS_GameRunner [ label = "init" color = "#AA7755" ];
+	HaoStarter -> HS_GameRunner [ label = "start,(init)" color = "#227755" ];
 
 	HS_GameRunner -> AtcServiceAdapter [ label = "request version" color = "#AA7755" ];
-	HS_GameRunner -> gameServiceAdapter [ label = "start game" color = "#AA7755" ];
+	HS_GameRunner -> gameServiceAdapter [ label = "start game" ];
 	HS_GameRunner -> HaoStarter [ label = "hao quit" ];
 	HS_GameRunner -> eventServiceAdapter [ label = "requestMoreEvents" color = "#AA7755" ];
 
 	gameServiceAdapter -> gameServiceEndpoint [ label = "gState, startG" ];
 
-	gameServiceEndpoint -> CoalesceBlobs [ label = "sg, gs response" color = "red" ];
 	gameServiceEndpoint -> gameServiceAdapter [ label = "sg gs response" ];
 
 	knowsAirplanes -> CanvasAdapter [ label = "(flightplan) (planemoved) arrived" ];

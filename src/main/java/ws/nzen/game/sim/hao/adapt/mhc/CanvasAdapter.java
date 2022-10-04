@@ -36,6 +36,8 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 	private int millisecondsToSleep = 200;
 	private final Queue<HaoEvent> repaintInput;
 	private final Queue<HaoEvent> endGameOutward;
+	private final Queue<HaoMessage> haoGameStartRequests;
+	private final Queue<MhcMessage> mhcGameStartRequests;
 	private final Queue<Quit> mhcQuitInput;
 
 
@@ -46,6 +48,8 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 			KnowsMap haoMap,
 			Queue<HaoEvent> repaintInput,
 			Queue<HaoEvent> endGameOutward,
+			Queue<HaoMessage> haoGameStartRequests,
+			Queue<MhcMessage> mhcGameStartRequests,
 			Queue<Quit> mhcQuitInput
 	) {
 		if ( boardMapper == null )
@@ -60,6 +64,8 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 			throw new NullPointerException( "repaintInput must not be null" );
 		else if ( endGameOutward == null )
 			throw new NullPointerException( "endGameOutward must not be null" );
+		else if ( mhcGameStartRequests == null )
+			throw new NullPointerException( "mhcGameStartRequests must not be null" );
 		else if ( mhcQuitInput == null )
 			throw new NullPointerException( "mhcQuitInput must not be null" );
 		this.boardMapper = boardMapper;
@@ -68,6 +74,8 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 		this.haoMap = haoMap;
 		this.repaintInput = repaintInput;
 		this.endGameOutward = endGameOutward;
+		this.haoGameStartRequests = haoGameStartRequests;
+		this.mhcGameStartRequests = mhcGameStartRequests;
 		this.mhcQuitInput = mhcQuitInput;
 		canvas.start();
 	}
@@ -104,6 +112,14 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 					endGameOutward.offer( HaoEvent.END_REQUESTED );
 					quit();
 					break mainLoop;
+				}
+
+				while ( ! repaintInput.isEmpty() )
+				{
+					HaoEvent message = repaintInput.poll();
+					if ( message == null )
+						break;
+					updateMap();
 				}
 
 				while ( ! repaintInput.isEmpty() )
