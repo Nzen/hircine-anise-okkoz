@@ -36,6 +36,8 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 	private final Queue<AtcEventGameStarted> gameStartEvents;
 	private final Queue<StreamRequest> requests;
 	private final Queue<StreamResponse> responses;
+	private final Queue<HaoMessage> startStreamRequests;
+	private final Queue<AtcEventGameStopped> atcEndedGame;
 	private final Thread runsEventService;
 
 
@@ -46,7 +48,9 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 			Queue<StreamResponse> forResponses,
 			Queue<AtcEvent> atcEvents,
 			Queue<AtcEventGameStarted> gameStartEvents,
-			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected
+			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected,
+			Queue<HaoMessage> startStreamRequests,
+			Queue<AtcEventGameStopped> atcEndedGame
 	) {
 		if ( forRequests == null )
 			throw new NullPointerException( "forRequests must not be null" );
@@ -60,22 +64,21 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 			throw new NullPointerException( "mapper must not be null" );
 		else if ( atcEventsAirplaneDetected == null )
 			throw new NullPointerException( "atcEventsAirplaneDetected must not be null" );
+		else if ( startStreamRequests == null )
+			throw new NullPointerException( "startStreamRequests must not be null" );
+		else if ( atcEndedGame == null )
+			throw new NullPointerException( "atcEndedGame must not be null" );
 		eventService = eventStream;
 		requests = forRequests;
 		responses = forResponses;
 		this.atcEvents = atcEvents;
 		this.gameStartEvents = gameStartEvents;
 		this.atcEventsAirplaneDetected = atcEventsAirplaneDetected;
+		this.startStreamRequests = startStreamRequests;
+		this.atcEndedGame = atcEndedGame;
 		eventMapper = mapper;
 		runsEventService = new Thread( eventService );
 		runsEventService.start();
-	}
-
-
-	@Override
-	public void requestMoreEvents(
-	) {
-		requests.offer( StreamRequest.newBuilder().build() );
 	}
 
 
@@ -105,8 +108,19 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 						gameStartEvents.offer( (AtcEventGameStarted)event );
 					else if ( event.getType() == AtcEventType.AIRPLANE_DETECTED )
 						atcEventsAirplaneDetected.offer( (AtcEventAirplaneDetected)event );
+					else if ( event.getType() == AtcEventType.GAME_STOPPED )
+						atcEndedGame.offer( (AtcEventGameStopped)event );
 					else
 						atcEvents.offer( event );
+				}
+
+				while ( ! startStreamRequests.isEmpty() )
+				{
+					HaoMessage message = startStreamRequests.poll();
+					if ( message != HaoMessage.START_EVENT_STREAM )
+						log.info( "ignoring unhandled message type: "+ message );
+					else
+						requests.offer( StreamRequest.newBuilder().build() );
 				}
 
 				Thread.sleep( millisecondsToSleep );

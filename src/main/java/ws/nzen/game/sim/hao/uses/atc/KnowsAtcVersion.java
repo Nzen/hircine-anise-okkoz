@@ -11,6 +11,6 @@ import ws.nzen.game.sim.hao.uses.any.Quittable;
 /**
 
 */
-public interface RequestsEvents extends Runnable, Quittable
+public interface KnowsAtcVersion extends Runnable, Quittable
 {
 }

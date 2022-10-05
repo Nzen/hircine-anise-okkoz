@@ -13,6 +13,7 @@ import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ws.nzen.game.adventure.mhc.message.Move;
 import ws.nzen.game.adventure.mhc.message.Quit;
 import ws.nzen.game.sim.hao.game.*;
 import ws.nzen.game.sim.hao.uses.atc.KnowsAirplanes;
@@ -39,6 +40,8 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 	private final Queue<HaoMessage> haoGameStartRequests;
 	private final Queue<MhcMessage> mhcGameStartRequests;
 	private final Queue<Quit> mhcQuitInput;
+	private final Queue<HaoMessage> viewConnected;
+	private final Queue<Move> mhcViewConnected;
 
 
 	public CanvasAdapter(
@@ -50,7 +53,9 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 			Queue<HaoEvent> endGameOutward,
 			Queue<HaoMessage> haoGameStartRequests,
 			Queue<MhcMessage> mhcGameStartRequests,
-			Queue<Quit> mhcQuitInput
+			Queue<Quit> mhcQuitInput,
+			Queue<HaoMessage> viewConnected,
+			Queue<Move> mhcViewConnected
 	) {
 		if ( boardMapper == null )
 			throw new NullPointerException( "boardMapper must not be null" );
@@ -68,6 +73,10 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 			throw new NullPointerException( "mhcGameStartRequests must not be null" );
 		else if ( mhcQuitInput == null )
 			throw new NullPointerException( "mhcQuitInput must not be null" );
+		else if ( viewConnected == null )
+			throw new NullPointerException( "viewConnected must not be null" );
+		else if ( mhcViewConnected == null )
+			throw new NullPointerException( "mhcViewConnected must not be null" );
 		this.boardMapper = boardMapper;
 		this.canvas = canvas;
 		this.knowsAirplanes = knowsAirplanes;
@@ -77,6 +86,8 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 		this.haoGameStartRequests = haoGameStartRequests;
 		this.mhcGameStartRequests = mhcGameStartRequests;
 		this.mhcQuitInput = mhcQuitInput;
+		this.viewConnected = viewConnected;
+		this.mhcViewConnected = mhcViewConnected;
 		canvas.start();
 	}
 
@@ -122,12 +133,20 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 					updateMap();
 				}
 
-				while ( ! repaintInput.isEmpty() )
+				while ( ! mhcQuitInput.isEmpty() )
 				{
-					HaoEvent message = repaintInput.poll();
+					Quit message = mhcQuitInput.poll();
 					if ( message == null )
 						break;
-					updateMap();
+					endGameOutward.offer( HaoEvent.END_REQUESTED );
+				}
+
+				while ( ! mhcViewConnected.isEmpty() )
+				{
+					Move message = mhcViewConnected.poll();
+					if ( message == null )
+						break;
+					viewConnected.offer( HaoMessage.VIEW_CONNECTED );
 				}
 
 				Thread.sleep( millisecondsToSleep );

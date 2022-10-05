@@ -25,11 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import ws.nzen.game.adventure.mhc.HandlesInput;
 import ws.nzen.game.adventure.mhc.Keymap;
-import ws.nzen.game.adventure.mhc.message.Cell;
-import ws.nzen.game.adventure.mhc.message.ClientJsonMessage;
-import ws.nzen.game.adventure.mhc.message.Quit;
-import ws.nzen.game.adventure.mhc.message.Request;
-import ws.nzen.game.adventure.mhc.message.Type;
+import ws.nzen.game.adventure.mhc.message.*;
 import ws.nzen.game.sim.hao.game.MhcBoard;
 
 
@@ -46,16 +42,21 @@ public class CanvasEndpoint extends WebSocketServer
 	private MhcBoard board = null;
 	private Map<InetSocketAddress, WebSocket> listeners = new HashMap<>();
 	private final Queue<Quit> mhcQuitOutput;
+	private final Queue<Move> mhcViewConnected;
 
 
 	public CanvasEndpoint(
 			int portNumber,
-			Queue<Quit> mhcQuitOutput
+			Queue<Quit> mhcQuitOutput,
+			Queue<Move> mhcViewConnected
 	) {
 		super( new InetSocketAddress( portNumber ) );
 		if ( mhcQuitOutput == null )
 			throw new NullPointerException( "mhcQuitOutput must not be null" );
+		else if ( mhcViewConnected == null )
+			throw new NullPointerException( "mhcViewConnected must not be null" );
 		this.mhcQuitOutput = mhcQuitOutput;
+		this.mhcViewConnected = mhcViewConnected;
 	}
 
 
@@ -166,6 +167,7 @@ public class CanvasEndpoint extends WebSocketServer
 		);
 		conn.send( boardViewMessage().toString() );
 		listeners.put( conn.getLocalSocketAddress(), conn );
+		mhcViewConnected.offer( new Move( -1, -1 ) );
 	}
 
 

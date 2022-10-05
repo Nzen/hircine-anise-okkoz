@@ -7,12 +7,9 @@ package ws.nzen.game.sim.hao.game;
 /**
 
 */
-public enum HaoMessage
+public enum MhcMessage
 {
-	CHECK_COMPATABILITY,
-	START_EVENT_STREAM,
-	START_GAME,
-	VIEW_CONNECTED;
+	START_GAME;
 }
 
 

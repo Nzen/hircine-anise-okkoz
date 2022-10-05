@@ -11,9 +11,11 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import atc.v1.Atc.GetVersionRequest;
+import atc.v1.Atc.GetVersionResponse;
 import atc.v1.Event.*;
 import atc.v1.Game.*;
-import ws.nzen.game.adventure.mhc.message.Quit;
+import ws.nzen.game.adventure.mhc.message.*;
 import ws.nzen.game.sim.hao.adapt.atc.*;
 import ws.nzen.game.sim.hao.adapt.cli.*;
 import ws.nzen.game.sim.hao.adapt.mhc.*;
@@ -40,14 +42,16 @@ public class Factory
 	) {
 		return canvasAdapter(
 				boardMapper(),
-				canvasEndpoint( portNumber, queueCanvasQuit() ),
+				canvasEndpoint( portNumber, queueCanvasQuit(), queueCanvasConnected() ),
 				knowsAirplanes,
 				knowsMap,
 				queueRepaintHaoEvent(),
 				queueHaoEventEndGame(),
 				queueHaoMessageStartGame(),
 				queueCanvasStart(),
-				queueCanvasQuit() );
+				queueCanvasQuit(),
+				queueViewConnected(),
+				queueCanvasConnected() );
 	}
 
 
@@ -56,6 +60,24 @@ public class Factory
 		return airplaneDispatch(
 				airplaneCache( queueRepaintHaoEvent() ),
 				queueAtcEventAirplaneDetected() );
+	}
+
+
+	public KnowsAtcVersion knowsAtcVersion(
+			String host,
+			int port
+	) {
+		return atcServiceAdapter(
+				atcServiceEndpoint(
+						host,
+						port,
+						queueGetVersionRequest(),
+						queueGetVersionResponse() ),
+				gameVersionMapper(),
+				queueGetVersionRequest(),
+				queueGetVersionResponse(),
+				queueAtcGameVersion(),
+				queueGetAtcVersionRequest() );
 	}
 
 
@@ -86,6 +108,51 @@ public class Factory
 	}
 
 
+	public Queue<AtcEventAirplaneDetected> queueAtcEventAirplaneDetected(
+	) {
+		final String name = "queueAtcEventAirplaneDetected";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<AtcEventAirplaneDetected>)queues.get( name );
+	}
+
+
+	public Queue<AtcEventGameStarted> queueAtcEventGameStarted(
+	) {
+		final String name = "queueAtcEventGameStarted";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<AtcEventGameStarted>)queues.get( name );
+	}
+
+
+	public Queue<AtcEventGameStopped> queueAtcEventGameStopped(
+	) {
+		final String name = "queueAtcEventGameStopped";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<AtcEventGameStopped>)queues.get( name );
+	}
+
+
+	public Queue<AtcGameVersion> queueAtcGameVersion(
+	) {
+		final String name = "queueAtcGameVersion";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<AtcGameVersion>)queues.get( name );
+	}
+
+
+	public Queue<Move> queueCanvasConnected(
+	) {
+		final String name = "queueCanvasConnected";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<Move>)queues.get( name );
+	}
+
+
 	public Queue<Quit> queueCanvasQuit(
 	) {
 		final String nameCanvasQuit = "queueCanvasQuit";
@@ -104,6 +171,15 @@ public class Factory
 	}
 
 
+	public Queue<HaoMessage> queueGetAtcVersionRequest(
+	) {
+		final String name = "queueGetAtcVersionRequest";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<HaoMessage>)queues.get( name );
+	}
+
+
 	public Queue<GetGameStateRequest> queueGetGameStateRequest(
 	) {
 		final String nameGetGameStateRequest = "queueGetGameStateRequest";
@@ -119,6 +195,60 @@ public class Factory
 		if ( ! queues.containsKey( nameGetGameStateResponse ) )
 			queues.put( nameGetGameStateResponse, new ConcurrentLinkedQueue<>() );
 		return (Queue<GetGameStateResponse>)queues.get( nameGetGameStateResponse );
+	}
+
+
+	public Queue<GetVersionRequest> queueGetVersionRequest(
+	) {
+		final String name = "queueGetVersionRequest";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<GetVersionRequest>)queues.get( name );
+	}
+
+
+	public Queue<GetVersionResponse> queueGetVersionResponse(
+	) {
+		final String name = "queueGetVersionResponse";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<GetVersionResponse>)queues.get( name );
+	}
+
+
+	public Queue<HaoEvent> queueHaoEventEndGame(
+	) {
+		final String name = "queueHaoEventEndGame";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<HaoEvent>)queues.get( name );
+	}
+
+
+	public Queue<HaoMessage> queueHaoMessageStartGame(
+	) {
+		final String name = "queueHaoMessageStartGame";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<HaoMessage>)queues.get( name );
+	}
+
+
+	public Queue<AtcEvent> queueOtherAtcEvent(
+	) {
+		final String name = "queueOtherAtcEvent";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<AtcEvent>)queues.get( name );
+	}
+
+
+	public Queue<HaoEvent> queueRepaintHaoEvent(
+	) {
+		final String name = "queueRepaintHaoEvent";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<HaoEvent>)queues.get( name );
 	}
 
 
@@ -167,54 +297,18 @@ public class Factory
 	}
 
 
-	public Queue<AtcEvent> queueOtherAtcEvent(
+	public Queue<HaoMessage> queueStartEventStream(
 	) {
-		final String name = "queueOtherAtcEvent";
+		final String name = "queueStartEventStream";
 		if ( ! queues.containsKey( name ) )
 			queues.put( name, new ConcurrentLinkedQueue<>() );
-		return (Queue<AtcEvent>)queues.get( name );
+		return (Queue<HaoMessage>)queues.get( name );
 	}
 
 
-	public Queue<HaoEvent> queueRepaintHaoEvent(
+	public Queue<HaoMessage> queueViewConnected(
 	) {
-		final String name = "queueRepaintHaoEvent";
-		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
-		return (Queue<HaoEvent>)queues.get( name );
-	}
-
-
-	public Queue<AtcEventGameStarted> queueAtcEventGameStarted(
-	) {
-		final String name = "queueAtcEventGameStarted";
-		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
-		return (Queue<AtcEventGameStarted>)queues.get( name );
-	}
-
-
-	public Queue<AtcEventAirplaneDetected> queueAtcEventAirplaneDetected(
-	) {
-		final String name = "queueAtcEventAirplaneDetected";
-		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
-		return (Queue<AtcEventAirplaneDetected>)queues.get( name );
-	}
-
-
-	public Queue<HaoEvent> queueHaoEventEndGame(
-	) {
-		final String name = "queueHaoEventEndGame";
-		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
-		return (Queue<HaoEvent>)queues.get( name );
-	}
-
-
-	public Queue<HaoMessage> queueHaoMessageStartGame(
-	) {
-		final String name = "queueHaoMessageStartGame";
+		final String name = "queueViewConnected";
 		if ( ! queues.containsKey( name ) )
 			queues.put( name, new ConcurrentLinkedQueue<>() );
 		return (Queue<HaoMessage>)queues.get( name );
@@ -247,8 +341,9 @@ public class Factory
 				queueStreamResponse(),
 				queueOtherAtcEvent(),
 				queueAtcEventGameStarted(),
-				queueAtcEventAirplaneDetected()
-		);
+				queueAtcEventAirplaneDetected(),
+				queueStartEventStream(),
+				queueAtcEventGameStopped() );
 	}
 
 
@@ -268,14 +363,16 @@ public class Factory
 	) {
 		return canvasAdapter(
 				boardMapper(),
-				canvasEndpoint( portNumber, queueCanvasQuit() ),
+				canvasEndpoint( portNumber, queueCanvasQuit(), queueCanvasConnected() ),
 				knowsAirplanes,
 				knowsMap,
 				queueRepaintHaoEvent(),
 				queueHaoEventEndGame(),
 				queueHaoMessageStartGame(),
 				queueCanvasStart(),
-				queueCanvasQuit() );
+				queueCanvasQuit(),
+				queueViewConnected(),
+				queueCanvasConnected() );
 	}
 
 
@@ -331,6 +428,60 @@ public class Factory
 	}
 
 
+	private AtcServiceAdapter atcServiceAdapter(
+			AtcServiceEndpoint gameVersionStream,
+			GameVersionMapper mapper,
+			Queue<GetVersionRequest> gameVersionRequests,
+			Queue<GetVersionResponse> gameVersionResponses,
+			Queue<AtcGameVersion> gameVersions,
+			Queue<HaoMessage> checkVersionRequests
+	) {
+		Class<?> atcServiceAdapterClass = AtcServiceAdapter.class;
+		if ( instances.containsKey( atcServiceAdapterClass ) )
+			return (AtcServiceAdapter)instances.get( atcServiceAdapterClass );
+		instances.put(
+				atcServiceAdapterClass,
+				new AtcServiceAdapter(
+						gameVersionStream,
+						mapper,
+						gameVersionRequests,
+						gameVersionResponses,
+						gameVersions,
+						checkVersionRequests ) );
+		return atcServiceAdapter(
+				gameVersionStream,
+				mapper,
+				gameVersionRequests,
+				gameVersionResponses,
+				gameVersions,
+				checkVersionRequests );
+	}
+
+
+	private AtcServiceEndpoint atcServiceEndpoint(
+			String host,
+			int port,
+			Queue<GetVersionRequest> versionRequests,
+			Queue<GetVersionResponse> versionResponses
+	) {
+		Class<?> atcServiceEndpointClass = AtcServiceEndpoint.class;
+		if ( instances.containsKey( atcServiceEndpointClass ) )
+			return (AtcServiceEndpoint)instances.get( atcServiceEndpointClass );
+		instances.put(
+				atcServiceEndpointClass,
+				new AtcServiceEndpoint(
+						host,
+						port,
+						versionRequests,
+						versionResponses ) );
+		return atcServiceEndpoint(
+				host,
+				port,
+				versionRequests,
+				versionResponses );
+	}
+
+
 	private BoardMapper boardMapper(
 	) {
 		Class<?> boardMapperClass = BoardMapper.class;
@@ -352,7 +503,9 @@ public class Factory
 			Queue<HaoEvent> endGameOutward,
 			Queue<HaoMessage> startGameOutward,
 			Queue<MhcMessage> startGameMhc,
-			Queue<Quit> mhcQuitInput
+			Queue<Quit> mhcQuitInput,
+			Queue<HaoMessage> viewConnected,
+			Queue<Move> mhcViewConnected
 	) {
 		Class<?> canvasAdapterClass = CanvasAdapter.class;
 		if ( instances.containsKey( canvasAdapterClass ) )
@@ -368,7 +521,9 @@ public class Factory
 						endGameOutward,
 						startGameOutward,
 						startGameMhc,
-						mhcQuitInput ) );
+						mhcQuitInput,
+						viewConnected,
+						mhcViewConnected ) );
 		return canvasAdapter(
 				boardMapper,
 				canvasEndpoint,
@@ -378,21 +533,24 @@ public class Factory
 				endGameOutward,
 				startGameOutward,
 				startGameMhc,
-				mhcQuitInput );
+				mhcQuitInput,
+				viewConnected,
+				mhcViewConnected );
 	}
 
 
 	private CanvasEndpoint canvasEndpoint(
 			int portNumber,
-			Queue<Quit> mhcQuitOutput
+			Queue<Quit> mhcQuitOutput,
+			Queue<Move> mhcViewConnected
 	) {
 		Class<?> canvasEndpointClass = CanvasEndpoint.class;
 		if ( instances.containsKey( canvasEndpointClass ) )
 			return (CanvasEndpoint)instances.get( canvasEndpointClass );
 		instances.put(
 				canvasEndpointClass,
-				new CanvasEndpoint( portNumber, mhcQuitOutput ) );
-		return canvasEndpoint( portNumber, mhcQuitOutput );
+				new CanvasEndpoint( portNumber, mhcQuitOutput, mhcViewConnected ) );
+		return canvasEndpoint( portNumber, mhcQuitOutput, mhcViewConnected );
 	}
 
 
@@ -403,7 +561,9 @@ public class Factory
 			Queue<StreamResponse> forResponses,
 			Queue<AtcEvent> atcEvents,
 			Queue<AtcEventGameStarted> gameStartEvents,
-			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected
+			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected,
+			Queue<HaoMessage> checkVersionRequests,
+			Queue<AtcEventGameStopped> atcEndedGame
 	) {
 		Class<?> eventServiceAdapterClass = EventServiceAdapter.class;
 		if ( instances.containsKey( eventServiceAdapterClass ) )
@@ -417,7 +577,9 @@ public class Factory
 						forResponses,
 						atcEvents,
 						gameStartEvents,
-						atcEventsAirplaneDetected ) );
+						atcEventsAirplaneDetected,
+						checkVersionRequests,
+						atcEndedGame ) );
 		return eventServiceAdapter(
 				atcEventStream,
 				mapper,
@@ -425,7 +587,9 @@ public class Factory
 				forResponses,
 				atcEvents,
 				gameStartEvents,
-				atcEventsAirplaneDetected );
+				atcEventsAirplaneDetected,
+				checkVersionRequests,
+				atcEndedGame );
 	}
 
 
@@ -526,6 +690,18 @@ public class Factory
 				forGameStateResponses,
 				forStartGameRequests,
 				forStartGameResponses );
+	}
+
+
+	private GameVersionMapper gameVersionMapper(
+	) {
+		Class<?> gameVersionMapperClass = GameVersionMapper.class;
+		if ( instances.containsKey( gameVersionMapperClass ) )
+			return (GameVersionMapper)instances.get( gameVersionMapperClass );
+		instances.put(
+				gameVersionMapperClass,
+				new GameVersionMapper() );
+		return gameVersionMapper();
 	}
 
 

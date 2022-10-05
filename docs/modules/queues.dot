@@ -8,11 +8,11 @@ digraph haokkoz_data_flow
 
 	{
 		rank = same;
-		AtcServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for game version
+		AtcServiceEndpoint [ shape = invhouse ]; # for game version
 		AirplaneServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for updating flight plans
 		MapServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for node to point conversion
-		eventServiceEndpoint [ shape = invhouse ];
-		gameServiceEndpoint [ shape = invhouse ];
+		eventServiceEndpoint [ shape = invhouse ]; # for events
+		gameServiceEndpoint [ shape = invhouse ]; # to start games
 	}
 
 	{
@@ -24,7 +24,7 @@ digraph haokkoz_data_flow
 	{
 		rank = same;
 		AirplaneServiceAdapter [ color = "#AA7755" ];
-		AtcServiceAdapter [ color = "#AA7755" ];
+		AtcServiceAdapter;
 		eventServiceAdapter;
 		gameServiceAdapter;
 		MapServiceAdapter [ color = "#AA7755" ];
@@ -53,30 +53,30 @@ digraph haokkoz_data_flow
 
 	AirplaneServiceEndpoint -> AirplaneServiceAdapter [ label = "path responses" color = "#AA7755" ];
 
-	AtcServiceAdapter -> AtcServiceEndpoint [ label = "game version requests" color = "#AA7755" ];
-	AtcServiceAdapter -> HS_GameRunner [ label = "game version" color = "#AA7755" ];
+	AtcServiceAdapter -> AtcServiceEndpoint [ label = "game version requests" ];
+	AtcServiceAdapter -> HS_GameRunner [ label = "game version" ];
 
-	AtcServiceEndpoint -> AtcServiceAdapter [ label = "game version responses" color = "#AA7755" ];
+	AtcServiceEndpoint -> AtcServiceAdapter [ label = "game version responses" ];
 
-	CanvasEndpoint -> CanvasAdapter [ label = "mhc quit" ];
+	CanvasEndpoint -> CanvasAdapter [ label = "connected, quit" ];
 
 	CanvasAdapter -> CanvasEndpoint [ label = "mhc map" ];
-	CanvasAdapter -> HS_GameRunner [ label = "hao quit (startGame)" ];
+	CanvasAdapter -> HS_GameRunner [ label = "hao quit, ~startGame" ];
 
 	eventServiceAdapter -> eventServiceEndpoint [ label = "stream request" ];
 	eventServiceAdapter -> knowsMap [ label = "gameStart" ];
 	eventServiceAdapter -> stdOutAdapter [ label = "other atcEvents" ];
 	eventServiceAdapter -> knowsAirplanes [ label = "Airplane arrived, (flightchanged)" color = "#AA7755" ];
+	eventServiceAdapter -> HS_GameRunner [ label = "game ended" color = "red" ];
 
 	eventServiceEndpoint -> eventServiceAdapter [ label = "s responses" ];
 
-	HaoStarter -> eventServiceAdapter [ label = "requestMoreEvents" color = "red" ];
-	HaoStarter -> HS_GameRunner [ label = "start,(init)" color = "#227755" ];
+	HaoStarter -> HS_GameRunner [ label = "init" color = "#227755" ];
 
-	HS_GameRunner -> AtcServiceAdapter [ label = "request version" color = "#AA7755" ];
+	HS_GameRunner -> AtcServiceAdapter [ label = "request version" ];
 	HS_GameRunner -> gameServiceAdapter [ label = "start game" ];
-	HS_GameRunner -> HaoStarter [ label = "hao quit" ];
-	HS_GameRunner -> eventServiceAdapter [ label = "requestMoreEvents" color = "#AA7755" ];
+	HS_GameRunner -> HaoStarter [ label = "hao quit" color = "#227755" ];
+	HS_GameRunner -> eventServiceAdapter [ label = "request events" ];
 
 	gameServiceAdapter -> gameServiceEndpoint [ label = "gState, startG" ];
 
