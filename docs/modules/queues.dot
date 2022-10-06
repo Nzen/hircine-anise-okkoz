@@ -41,11 +41,11 @@ digraph haokkoz_data_flow
 		knowsAirplanes [ label = "kA (AirplaneDispatch)" ];
 		knowsMap [ label = "kM (MapDispatch)" ];
 		SchedulesFlights [ color = "#AA7755" ];
-		ZonesMap [ color = "#AA7755" ];
 	}
 
 	HaoStarter;
 	HS_GameRunner;
+	ZonesMap [ color = "#AA7755" ];
 
 	# [ label = "" ];
 
@@ -66,7 +66,7 @@ digraph haokkoz_data_flow
 	eventServiceAdapter -> eventServiceEndpoint [ label = "stream request" ];
 	eventServiceAdapter -> knowsMap [ label = "gameStart" ];
 	eventServiceAdapter -> stdOutAdapter [ label = "other atcEvents" ];
-	eventServiceAdapter -> knowsAirplanes [ label = "Airplane arrived, (flightchanged)" color = "#AA7755" ];
+	eventServiceAdapter -> knowsAirplanes [ label = "Arrived (flightchanged) (moved px)" ];
 	eventServiceAdapter -> HS_GameRunner [ label = "game ended" color = "red" ];
 
 	eventServiceEndpoint -> eventServiceAdapter [ label = "s responses" ];
@@ -94,7 +94,7 @@ digraph haokkoz_data_flow
 
 	MapServiceEndpoint -> MapServiceAdapter [ label = "node-point responses" color = "#AA7755" ];
 
-	SchedulesFlights -> AirplaneServiceAdapter [ label = "get paths" color = "#AA7755" ];
+	SchedulesFlights -> AirplaneServiceAdapter [ label = "change paths" color = "#AA7755" ];
 
 	stdOutAdapter -> stdOutEndpoint [ label = "strings" ];
 
