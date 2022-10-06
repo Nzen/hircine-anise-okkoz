@@ -82,12 +82,11 @@ digraph haokkoz_data_flow
 
 	gameServiceEndpoint -> gameServiceAdapter [ label = "sg gs response" ];
 
-	knowsAirplanes -> CanvasAdapter [ label = "(flightplan) (planemoved) arrived" ];
+	knowsAirplanes -> CanvasAdapter [ label = "arrived path-change (planemoved)" ];
 	knowsAirplanes -> SchedulesFlights [ label = "arrived" color = "#AA7755" ];
 	knowsAirplanes -> ZonesMap [ label = "arrived" color = "#AA7755" ];
 
-	knowsMap -> CanvasAdapter [ label = "map saved" color = "#AA7755" ];
-	knowsMap -> knowsAirplanes [ label = "get paths" color = "#AA7755" ];
+	knowsMap -> CanvasAdapter [ label = "map saved" ];
 
 	MapServiceAdapter -> MapServiceEndpoint [ label = "node-point requests" color = "#AA7755" ];
 	MapServiceAdapter -> ZonesMap [ label = "node-point" color = "#AA7755" ];
