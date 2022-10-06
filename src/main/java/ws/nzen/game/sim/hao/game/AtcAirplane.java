@@ -13,7 +13,7 @@ public class AtcAirplane
 
 	private AtcFlightPlan flightPlan;
 	private AtcMapPoint location;
-	private AtcRoutingNode closestRoutingNode; // necessary for mhc ? or use a map
+	private AtcRoutingNode closestRoutingNode; // FIX have boardMapper ask the KnowsMap for node
 	private final AtcTeamTag team;
 	private final String atcId;
 

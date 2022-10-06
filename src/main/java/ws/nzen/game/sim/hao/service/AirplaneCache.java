@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Queue;
 
 import ws.nzen.game.sim.hao.game.AtcAirplane;
+import ws.nzen.game.sim.hao.game.AtcFlightPlan;
 import ws.nzen.game.sim.hao.game.HaoEvent;
 import ws.nzen.game.sim.hao.uses.atc.KnowsAirplanes;
 import ws.nzen.game.sim.hao.uses.atc.SavesAirplanes;
@@ -59,6 +60,18 @@ public class AirplaneCache implements KnowsAirplanes, SavesAirplanes
 			throw new NullPointerException( "airplane must not be null" );
 		airplanes.put( airplane.getAtcId(), airplane );
 		repaintEventsOutward.offer( HaoEvent.FLIGHT_PLAN_CHANGED );
+	}
+
+
+	public void updateFlightPlan(
+			String airplaneId, AtcFlightPlan flightPlan
+	) {
+		Optional<AtcAirplane> maybeAirplane = findById( airplaneId );
+		if ( ! maybeAirplane.isPresent() )
+			return;
+		AtcAirplane airplane = maybeAirplane.get();
+		airplane.setFlightPlan( flightPlan );
+		airplane.setClosestRoutingNode( flightPlan.getRoute().get( 0 ) );
 	}
 
 

@@ -80,7 +80,6 @@ public class MapDispatch implements Runnable, KnowsMapRunnably, Quittable
 					AtcEventGameStarted mapEvent = atcEventGameStarted.poll();
 					if ( mapEvent == null )
 						break;
-			log.info( "map save" );
 					map.save( mapEvent.getMap() );
 				}
 

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import ws.nzen.game.sim.hao.game.AtcAirplane;
 import ws.nzen.game.sim.hao.game.AtcEventAirplaneDetected;
+import ws.nzen.game.sim.hao.game.AtcEventFlightPlanUpdated;
 import ws.nzen.game.sim.hao.uses.atc.KnowsAirplanesRunnably;
 
 
@@ -29,18 +30,23 @@ public class AirplaneDispatch implements KnowsAirplanesRunnably
 	private int millisecondsToSleep = 200;
 	private final AirplaneCache airplaneCache; // IMPROVE use Knows and Saves Airplanes
 	private final Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected;
+	private final Queue<AtcEventFlightPlanUpdated> aeFlightChanged;
 
 
 	public AirplaneDispatch(
 			AirplaneCache airplaneCache,
-			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected
+			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected,
+			Queue<AtcEventFlightPlanUpdated> aeFlightChanged
 	) {
 		if ( airplaneCache == null )
 			throw new NullPointerException( "airplaneCache must not be null" );
 		else if ( atcEventsAirplaneDetected == null )
 			throw new NullPointerException( "atcEventsAirplaneDetected must not be null" );
+		else if ( aeFlightChanged == null )
+			throw new NullPointerException( "aeFlightChanged must not be null" );
 		this.atcEventsAirplaneDetected = atcEventsAirplaneDetected;
 		this.airplaneCache = airplaneCache;
+		this.aeFlightChanged = aeFlightChanged;
 	}
 
 
@@ -76,6 +82,14 @@ public class AirplaneDispatch implements KnowsAirplanesRunnably
 				{
 					AtcEventAirplaneDetected airplaneEvent = atcEventsAirplaneDetected.poll();
 					airplaneCache.save( airplaneEvent.getAirplane() );
+				}
+
+				while ( ! aeFlightChanged.isEmpty() )
+				{
+					AtcEventFlightPlanUpdated airplaneEvent = aeFlightChanged.poll();
+					airplaneCache.updateFlightPlan(
+							airplaneEvent.getAirplaneId(),
+							airplaneEvent.getFlightPlan() );
 				}
 
 				Thread.sleep( millisecondsToSleep );

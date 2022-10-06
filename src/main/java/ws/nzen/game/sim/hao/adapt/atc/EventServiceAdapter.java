@@ -38,6 +38,7 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 	private final Queue<StreamResponse> responses;
 	private final Queue<HaoMessage> startStreamRequests;
 	private final Queue<AtcEventGameStopped> atcEndedGame;
+	private final Queue<AtcEventFlightPlanUpdated> aeFlightChanged;
 	private final Thread runsEventService;
 
 
@@ -50,7 +51,8 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 			Queue<AtcEventGameStarted> gameStartEvents,
 			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected,
 			Queue<HaoMessage> startStreamRequests,
-			Queue<AtcEventGameStopped> atcEndedGame
+			Queue<AtcEventGameStopped> atcEndedGame,
+			Queue<AtcEventFlightPlanUpdated> aeFlightChanged
 	) {
 		if ( forRequests == null )
 			throw new NullPointerException( "forRequests must not be null" );
@@ -68,6 +70,8 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 			throw new NullPointerException( "startStreamRequests must not be null" );
 		else if ( atcEndedGame == null )
 			throw new NullPointerException( "atcEndedGame must not be null" );
+		else if ( aeFlightChanged == null )
+			throw new NullPointerException( "aeFlightChanged must not be null" );
 		eventService = eventStream;
 		requests = forRequests;
 		responses = forResponses;
@@ -76,6 +80,7 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 		this.atcEventsAirplaneDetected = atcEventsAirplaneDetected;
 		this.startStreamRequests = startStreamRequests;
 		this.atcEndedGame = atcEndedGame;
+		this.aeFlightChanged = aeFlightChanged;
 		eventMapper = mapper;
 		runsEventService = new Thread( eventService );
 		runsEventService.start();
@@ -110,6 +115,8 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 						atcEventsAirplaneDetected.offer( (AtcEventAirplaneDetected)event );
 					else if ( event.getType() == AtcEventType.GAME_STOPPED )
 						atcEndedGame.offer( (AtcEventGameStopped)event );
+					else if ( event.getType() == AtcEventType.FLIGHT_PLAN_UPDATED )
+						aeFlightChanged.offer( (AtcEventFlightPlanUpdated)event );
 					else
 						atcEvents.offer( event );
 				}

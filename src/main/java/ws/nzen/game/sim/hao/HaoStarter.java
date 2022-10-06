@@ -278,6 +278,7 @@ public class HaoStarter
 		void start(
 		) {
 			haoGameStartRequests.offer( HaoMessage.START_GAME );
+			// FIX only if game is not running, else this will kill the running game
 		}
 
 

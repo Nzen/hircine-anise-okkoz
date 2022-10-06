@@ -53,7 +53,7 @@ public class BoardMapper
 				entities.add( airplaneSprite );
 			}
 			Entity airplaneSprite = new Entity(
-					asAwtPoint( airplane.getFlightPlan().getRoute().get( 0 ) ), // FIX use closest node
+					asAwtPoint( airplane.getClosestRoutingNode() ),
 					Integer.toString( airplaneSeen ),
 					planeColor,
 					airplane.getAtcId(),

@@ -59,7 +59,8 @@ public class Factory
 	) {
 		return airplaneDispatch(
 				airplaneCache( queueRepaintHaoEvent() ),
-				queueAtcEventAirplaneDetected() );
+				queueAtcEventAirplaneDetected(),
+				queueAtcEventFlightChanged() );
 	}
 
 
@@ -114,6 +115,15 @@ public class Factory
 		if ( ! queues.containsKey( name ) )
 			queues.put( name, new ConcurrentLinkedQueue<>() );
 		return (Queue<AtcEventAirplaneDetected>)queues.get( name );
+	}
+
+
+	public Queue<AtcEventFlightPlanUpdated> queueAtcEventFlightChanged(
+	) {
+		final String name = "queueAtcEventFlightChanged";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<>() );
+		return (Queue<AtcEventFlightPlanUpdated>)queues.get( name );
 	}
 
 
@@ -343,7 +353,8 @@ public class Factory
 				queueAtcEventGameStarted(),
 				queueAtcEventAirplaneDetected(),
 				queueStartEventStream(),
-				queueAtcEventGameStopped() );
+				queueAtcEventGameStopped(),
+				queueAtcEventFlightChanged() );
 	}
 
 
@@ -389,15 +400,22 @@ public class Factory
 
 	private AirplaneDispatch airplaneDispatch(
 			AirplaneCache airplaneCache,
-			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected
+			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected,
+			Queue<AtcEventFlightPlanUpdated> aeFlightChanged
 	) {
 		Class<?> airplaneDispatchClass = AirplaneDispatch.class;
 		if ( instances.containsKey( airplaneDispatchClass ) )
 			return (AirplaneDispatch)instances.get( airplaneDispatchClass );
 		instances.put(
 				airplaneDispatchClass,
-				new AirplaneDispatch( airplaneCache, atcEventsAirplaneDetected ) );
-		return airplaneDispatch( airplaneCache, atcEventsAirplaneDetected );
+				new AirplaneDispatch(
+						airplaneCache,
+						atcEventsAirplaneDetected,
+						aeFlightChanged ) );
+		return airplaneDispatch(
+				airplaneCache,
+				atcEventsAirplaneDetected,
+				aeFlightChanged );
 	}
 
 
@@ -563,7 +581,8 @@ public class Factory
 			Queue<AtcEventGameStarted> gameStartEvents,
 			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected,
 			Queue<HaoMessage> checkVersionRequests,
-			Queue<AtcEventGameStopped> atcEndedGame
+			Queue<AtcEventGameStopped> atcEndedGame,
+			Queue<AtcEventFlightPlanUpdated> aeFlightChanged
 	) {
 		Class<?> eventServiceAdapterClass = EventServiceAdapter.class;
 		if ( instances.containsKey( eventServiceAdapterClass ) )
@@ -579,7 +598,8 @@ public class Factory
 						gameStartEvents,
 						atcEventsAirplaneDetected,
 						checkVersionRequests,
-						atcEndedGame ) );
+						atcEndedGame,
+						aeFlightChanged ) );
 		return eventServiceAdapter(
 				atcEventStream,
 				mapper,
@@ -589,7 +609,8 @@ public class Factory
 				gameStartEvents,
 				atcEventsAirplaneDetected,
 				checkVersionRequests,
-				atcEndedGame );
+				atcEndedGame,
+				aeFlightChanged );
 	}
 
 
