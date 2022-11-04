@@ -10,14 +10,12 @@ import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import atc.v1.Atc;
 import atc.v1.Atc.GetVersionRequest;
 import atc.v1.Atc.GetVersionResponse;
 
 import ws.nzen.game.sim.hao.game.*;
-import ws.nzen.game.sim.hao.uses.any.Quittable;
+import ws.nzen.game.sim.hao.service.HaoConstants;
 import ws.nzen.game.sim.hao.uses.atc.KnowsAtcVersion;
-import ws.nzen.game.sim.hao.uses.atc.RequestsEvents;
 
 
 /**
@@ -32,7 +30,7 @@ public class AtcServiceAdapter implements KnowsAtcVersion
 	private boolean quit = false;
 	private final GameVersionMapper gameVersionMapper;
 	private final AtcServiceEndpoint gameVersionService;
-	private int millisecondsToSleep = 200;
+	private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 	private final Queue<AtcGameVersion> gameVersions;
 	private final Queue<GetVersionRequest> gameVersionRequests;
 	private final Queue<GetVersionResponse> gameVersionResponses;

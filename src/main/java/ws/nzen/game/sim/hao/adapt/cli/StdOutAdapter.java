@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ws.nzen.game.sim.hao.game.AtcEvent;
+import ws.nzen.game.sim.hao.service.HaoConstants;
 import ws.nzen.game.sim.hao.uses.any.Quittable;
 import ws.nzen.game.sim.hao.uses.view.ShowsEvents;
 
@@ -26,7 +27,7 @@ public class StdOutAdapter implements ShowsEvents, Runnable, Quittable
 			.getLogger( StdOutAdapter.class );
 
 	private boolean quit = false;
-	private int millisecondsToSleep = 200;
+	private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 	private final Queue<String> messages;
 	private final Queue<AtcEvent> atcEvents;
 	private final StdOutEndpoint stdout;

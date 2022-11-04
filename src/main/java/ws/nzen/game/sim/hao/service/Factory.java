@@ -5,6 +5,7 @@
 package ws.nzen.game.sim.hao.service;
 
 
+import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +16,9 @@ import atc.v1.Atc.GetVersionRequest;
 import atc.v1.Atc.GetVersionResponse;
 import atc.v1.Event.*;
 import atc.v1.Game.*;
+import atc.v1.MapOuterClass.NodeToPointRequest;
+import atc.v1.MapOuterClass.NodeToPointResponse;
+
 import ws.nzen.game.adventure.mhc.message.*;
 import ws.nzen.game.sim.hao.adapt.atc.*;
 import ws.nzen.game.sim.hao.adapt.cli.*;
@@ -82,9 +86,43 @@ public class Factory
 	}
 
 
+	public KnowsNodes knowsNodes(
+			String host,
+			int port
+	) {
+		return mapServiceAdapter(
+				mapMapper(),
+				mapServiceEndpoint(
+						host,
+						port,
+						queueNodeToPointRequests(),
+						queueNodeToPointResponses() ),
+				nodeMapper(),
+				pointMapper(),
+				queueNodeToPointRequests(),
+				queueNodeToPointResponses(),
+				queueNodeLocationRequests(),
+				queueNodeLocationResponses() );
+	}
+
+
 	public KnowsMapRunnably knowsMap(
 	) {
-		return mapDispatch( queueAtcEventGameStarted(), queueRepaintHaoEvent() );
+		return mapDispatch(
+				queueAtcEventGameStarted(),
+				queueRepaintHaoEvent(),
+				queueNodesToZone(),
+				queueZonedNodes() );
+	}
+
+
+	public LocatesNodes locatesNodes(
+	) {
+		return zonesMap(
+				queueNodesToZone(),
+				queueZonedNodes(),
+				queueNodeLocationRequests(),
+				queueNodeLocationResponses() );
 	}
 
 
@@ -113,7 +151,7 @@ public class Factory
 	) {
 		final String name = "queueAtcEventAirplaneDetected";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<AtcEventAirplaneDetected>() );
 		return (Queue<AtcEventAirplaneDetected>)queues.get( name );
 	}
 
@@ -122,7 +160,7 @@ public class Factory
 	) {
 		final String name = "queueAtcEventFlightChanged";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<AtcEventFlightPlanUpdated>() );
 		return (Queue<AtcEventFlightPlanUpdated>)queues.get( name );
 	}
 
@@ -131,7 +169,7 @@ public class Factory
 	) {
 		final String name = "queueAtcEventGameStarted";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<AtcEventGameStarted>() );
 		return (Queue<AtcEventGameStarted>)queues.get( name );
 	}
 
@@ -140,7 +178,7 @@ public class Factory
 	) {
 		final String name = "queueAtcEventGameStopped";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<AtcEventGameStopped>() );
 		return (Queue<AtcEventGameStopped>)queues.get( name );
 	}
 
@@ -149,7 +187,7 @@ public class Factory
 	) {
 		final String name = "queueAtcGameVersion";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<AtcGameVersion>() );
 		return (Queue<AtcGameVersion>)queues.get( name );
 	}
 
@@ -158,7 +196,7 @@ public class Factory
 	) {
 		final String name = "queueCanvasConnected";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<Move>() );
 		return (Queue<Move>)queues.get( name );
 	}
 
@@ -167,7 +205,7 @@ public class Factory
 	) {
 		final String nameCanvasQuit = "queueCanvasQuit";
 		if ( ! queues.containsKey( nameCanvasQuit ) )
-			queues.put( nameCanvasQuit, new ConcurrentLinkedQueue<>() );
+			queues.put( nameCanvasQuit, new ConcurrentLinkedQueue<Quit>() );
 		return (Queue<Quit>)queues.get( nameCanvasQuit );
 	}
 
@@ -176,7 +214,7 @@ public class Factory
 	) {
 		final String nameCanvasStart = "queueCanvasStart";
 		if ( ! queues.containsKey( nameCanvasStart ) )
-			queues.put( nameCanvasStart, new ConcurrentLinkedQueue<>() );
+			queues.put( nameCanvasStart, new ConcurrentLinkedQueue<MhcMessage>() );
 		return (Queue<MhcMessage>)queues.get( nameCanvasStart );
 	}
 
@@ -185,7 +223,7 @@ public class Factory
 	) {
 		final String name = "queueGetAtcVersionRequest";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<HaoMessage>() );
 		return (Queue<HaoMessage>)queues.get( name );
 	}
 
@@ -194,7 +232,7 @@ public class Factory
 	) {
 		final String nameGetGameStateRequest = "queueGetGameStateRequest";
 		if ( ! queues.containsKey( nameGetGameStateRequest ) )
-			queues.put( nameGetGameStateRequest, new ConcurrentLinkedQueue<>() );
+			queues.put( nameGetGameStateRequest, new ConcurrentLinkedQueue<GetGameStateRequest>() );
 		return (Queue<GetGameStateRequest>)queues.get( nameGetGameStateRequest );
 	}
 
@@ -203,7 +241,7 @@ public class Factory
 	) {
 		final String nameGetGameStateResponse = "queueGetGameStateResponse";
 		if ( ! queues.containsKey( nameGetGameStateResponse ) )
-			queues.put( nameGetGameStateResponse, new ConcurrentLinkedQueue<>() );
+			queues.put( nameGetGameStateResponse, new ConcurrentLinkedQueue<GetGameStateResponse>() );
 		return (Queue<GetGameStateResponse>)queues.get( nameGetGameStateResponse );
 	}
 
@@ -212,7 +250,7 @@ public class Factory
 	) {
 		final String name = "queueGetVersionRequest";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<GetVersionRequest>() );
 		return (Queue<GetVersionRequest>)queues.get( name );
 	}
 
@@ -221,7 +259,7 @@ public class Factory
 	) {
 		final String name = "queueGetVersionResponse";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<GetVersionResponse>() );
 		return (Queue<GetVersionResponse>)queues.get( name );
 	}
 
@@ -230,7 +268,7 @@ public class Factory
 	) {
 		final String name = "queueHaoEventEndGame";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<HaoEvent>() );
 		return (Queue<HaoEvent>)queues.get( name );
 	}
 
@@ -239,7 +277,7 @@ public class Factory
 	) {
 		final String name = "queueHaoMessageStartGame";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<HaoMessage>() );
 		return (Queue<HaoMessage>)queues.get( name );
 	}
 
@@ -248,8 +286,62 @@ public class Factory
 	) {
 		final String name = "queueOtherAtcEvent";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<AtcEvent>() );
 		return (Queue<AtcEvent>)queues.get( name );
+	}
+
+
+	public Queue<Map<AtcRoutingNode, Rectangle>> queueZonedNodes(
+	) {
+		final String name = "queueZonedNodes";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<Map<AtcRoutingNode, Rectangle>>() );
+		return (Queue<Map<AtcRoutingNode, Rectangle>>)queues.get( name );
+	}
+
+
+	public Queue<AtcRoutingNode> queueNodeLocationRequests(
+	) {
+		final String name = "queueNodeLocationRequests";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<Collection<AtcRoutingNode>>() );
+		return (Queue<AtcRoutingNode>)queues.get( name );
+	}
+
+
+	public Queue<Collection<AtcRoutingNode>> queueNodesToZone(
+	) {
+		final String name = "queueNodesToZone";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<Collection<AtcRoutingNode>>() );
+		return (Queue<Collection<AtcRoutingNode>>)queues.get( name );
+	}
+
+
+	public Queue<AtcNodePoint> queueNodeLocationResponses(
+	) {
+		final String name = "queueNodeLocationResponses";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<AtcNodePoint>() );
+		return (Queue<AtcNodePoint>)queues.get( name );
+	}
+
+
+	public Queue<NodeToPointRequest> queueNodeToPointRequests(
+	) {
+		final String name = "queueNodeToPointRequest";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<NodeToPointRequest>() );
+		return (Queue<NodeToPointRequest>)queues.get( name );
+	}
+
+
+	public Queue<NodeToPointResponse> queueNodeToPointResponses(
+	) {
+		final String name = "queueNodeToPointResponse";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<NodeToPointResponse>() );
+		return (Queue<NodeToPointResponse>)queues.get( name );
 	}
 
 
@@ -257,7 +349,7 @@ public class Factory
 	) {
 		final String name = "queueRepaintHaoEvent";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<HaoEvent>() );
 		return (Queue<HaoEvent>)queues.get( name );
 	}
 
@@ -266,7 +358,7 @@ public class Factory
 	) {
 		final String nameStartGameRequest = "queueStartGameRequest";
 		if ( ! queues.containsKey( nameStartGameRequest ) )
-			queues.put( nameStartGameRequest, new ConcurrentLinkedQueue<>() );
+			queues.put( nameStartGameRequest, new ConcurrentLinkedQueue<StartGameRequest>() );
 		return (Queue<StartGameRequest>)queues.get( nameStartGameRequest );
 	}
 
@@ -275,7 +367,7 @@ public class Factory
 	) {
 		final String nameStartGameResponse = "queueStartGameResponse";
 		if ( ! queues.containsKey( nameStartGameResponse ) )
-			queues.put( nameStartGameResponse, new ConcurrentLinkedQueue<>() );
+			queues.put( nameStartGameResponse, new ConcurrentLinkedQueue<StartGameResponse>() );
 		return (Queue<StartGameResponse>)queues.get( nameStartGameResponse );
 	}
 
@@ -284,7 +376,7 @@ public class Factory
 	) {
 		final String name = "queueStreamRequest";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<StreamRequest>() );
 		return (Queue<StreamRequest>)queues.get( name );
 	}
 
@@ -293,7 +385,7 @@ public class Factory
 	) {
 		final String name = "queueStreamResponse";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<StreamResponse>() );
 		return (Queue<StreamResponse>)queues.get( name );
 	}
 
@@ -302,7 +394,7 @@ public class Factory
 	) {
 		final String name = "queueString";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<String>() );
 		return (Queue<String>)queues.get( name );
 	}
 
@@ -311,7 +403,7 @@ public class Factory
 	) {
 		final String name = "queueStartEventStream";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<HaoMessage>() );
 		return (Queue<HaoMessage>)queues.get( name );
 	}
 
@@ -320,7 +412,7 @@ public class Factory
 	) {
 		final String name = "queueViewConnected";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
+			queues.put( name, new ConcurrentLinkedQueue<HaoMessage>() );
 		return (Queue<HaoMessage>)queues.get( name );
 	}
 /*
@@ -741,23 +833,39 @@ public class Factory
 
 	private MapDispatch mapDispatch(
 			Queue<AtcEventGameStarted> events,
-			Queue<HaoEvent> repaintEvents
+			Queue<HaoEvent> repaintEvents,
+			Queue<Collection<AtcRoutingNode>> nodesToZone,
+			Queue<Map<AtcRoutingNode, Rectangle>> nodeZones
 	) {
-		return mapDispatch( mapCache( repaintEvents ), events );
+		return mapDispatch(
+				mapCache( repaintEvents ),
+				events,
+				nodesToZone,
+				nodeZones );
 	}
 
 
 	private MapDispatch mapDispatch(
 			MapCache mapCache,
-			Queue<AtcEventGameStarted> events
+			Queue<AtcEventGameStarted> events,
+			Queue<Collection<AtcRoutingNode>> nodesToZone,
+			Queue<Map<AtcRoutingNode, Rectangle>> nodeZones
 	) {
 		Class<?> mapDispatchClass = MapDispatch.class;
 		if ( instances.containsKey( mapDispatchClass ) )
 			return (MapDispatch)instances.get( mapDispatchClass );
 		instances.put(
 				mapDispatchClass,
-				new MapDispatch( mapCache, events ) );
-		return mapDispatch( mapCache, events );
+				new MapDispatch(
+						mapCache,
+						events,
+						nodesToZone,
+						nodeZones ) );
+		return mapDispatch(
+				mapCache,
+				events,
+				nodesToZone,
+				nodeZones );
 	}
 
 
@@ -770,6 +878,66 @@ public class Factory
 				mapMapperClass,
 				new MapMapper( airportMapper(), nodeMapper() ) );
 		return mapMapper();
+	}
+
+
+	private MapServiceAdapter mapServiceAdapter(
+			MapMapper mapMapper,
+			MapServiceEndpoint mapServiceEndpoint,
+			NodeMapper nodeMapper,
+			PointMapper pointMapper,
+			Queue<NodeToPointRequest> nodeToPointRequests,
+			Queue<NodeToPointResponse> nodeToPointResponses,
+			Queue<AtcRoutingNode> nodeLocationRequests,
+			Queue<AtcNodePoint> nodeLocationResponses
+	) {
+		Class<?> adapterClass = MapServiceAdapter.class;
+		if ( instances.containsKey( adapterClass ) )
+			return (MapServiceAdapter)instances.get( adapterClass );
+		instances.put(
+				adapterClass,
+				new MapServiceAdapter(
+						mapMapper,
+						mapServiceEndpoint,
+						nodeMapper,
+						pointMapper,
+						nodeToPointRequests,
+						nodeToPointResponses,
+						nodeLocationRequests,
+						nodeLocationResponses ) );
+		return mapServiceAdapter(
+				mapMapper,
+				mapServiceEndpoint,
+				nodeMapper,
+				pointMapper,
+				nodeToPointRequests,
+				nodeToPointResponses,
+				nodeLocationRequests,
+				nodeLocationResponses );
+	}
+
+
+	private MapServiceEndpoint mapServiceEndpoint(
+			String host,
+			int port,
+			Queue<NodeToPointRequest> nodeToPointRequests,
+			Queue<NodeToPointResponse> nodeToPointResponses
+	) {
+		Class<?> endpointClass = MapServiceEndpoint.class;
+		if ( instances.containsKey( endpointClass ) )
+			return (MapServiceEndpoint)instances.get( endpointClass );
+		instances.put(
+				endpointClass,
+				new MapServiceEndpoint(
+						host,
+						port,
+						nodeToPointRequests,
+						nodeToPointResponses ) );
+		return mapServiceEndpoint(
+				host,
+				port,
+				nodeToPointRequests,
+				nodeToPointResponses );
 	}
 
 
@@ -842,4 +1010,40 @@ public class Factory
 		return tagMapper();
 	}
 
+
+	private ZonesMap zonesMap(
+			Queue<Collection<AtcRoutingNode>> nodesToZone,
+			Queue<Map<AtcRoutingNode, Rectangle>> nodeZones,
+			Queue<AtcRoutingNode> nodeToPointRequests,
+			Queue<AtcNodePoint> nodeLocationResponses
+	) {
+		Class<?> theClass = ZonesMap.class;
+		if ( instances.containsKey( theClass ) )
+			return (ZonesMap)instances.get( theClass );
+		instances.put(
+				theClass,
+				new ZonesMap(
+						nodesToZone,
+						nodeZones,
+						nodeToPointRequests,
+						nodeLocationResponses ) );
+		return zonesMap(
+				nodesToZone,
+				nodeZones,
+				nodeToPointRequests,
+				nodeLocationResponses );
+	}
+
 }
+
+
+
+
+
+
+
+
+
+
+
+

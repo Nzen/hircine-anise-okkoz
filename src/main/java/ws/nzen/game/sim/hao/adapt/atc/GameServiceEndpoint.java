@@ -15,6 +15,8 @@ import atc.v1.GameServiceGrpc.GameServiceStub;
 import io.grpc.Channel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+
+import ws.nzen.game.sim.hao.service.HaoConstants;
 import ws.nzen.game.sim.hao.uses.any.Quittable;
 
 import java.util.Queue;
@@ -36,7 +38,7 @@ public class GameServiceEndpoint implements Runnable, Quittable
 	private boolean quit = false;
 	private Channel channel;
 	private GameServiceStub gameService;
-	private int millisecondsToSleep = 200;
+	private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 	private final Queue<GetGameStateRequest> gameStateRequests;
 	private final Queue<GetGameStateResponse> gameStateResponses;
 	private final Queue<StartGameRequest> startGameRequests;

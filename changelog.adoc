@@ -30,6 +30,24 @@ the authors of Haokkoz release this file under the terms of the Apache license v
 
 * i20220823 shows airports and arriving airplanes
 
+== [0.0-alpha-4.0] - 2022-10-07
+
+=== Changed
+
+* i20220918 waits for web client before starting atc game
+
+== [0.0-alpha-5.0] - 2022-10-06
+
+=== Added
+
+* i20220823 shows flight plans as they update
+
+== [0.0-alpha-5.1] - 2022-11-03
+
+=== Added
+
+* i20220823 able to zone nodes
+
 ////
 == Unreleased
 

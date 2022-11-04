@@ -10,7 +10,7 @@ digraph haokkoz_data_flow
 		rank = same;
 		AtcServiceEndpoint [ shape = invhouse ]; # for game version
 		AirplaneServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for updating flight plans
-		MapServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for node to point conversion
+		MapServiceEndpoint [ shape = invhouse ]; # for node to point conversion
 		eventServiceEndpoint [ shape = invhouse ]; # for events
 		gameServiceEndpoint [ shape = invhouse ]; # to start games
 	}
@@ -27,7 +27,7 @@ digraph haokkoz_data_flow
 		AtcServiceAdapter;
 		eventServiceAdapter;
 		gameServiceAdapter;
-		MapServiceAdapter [ color = "#AA7755" ];
+		MapServiceAdapter;
 	}
 
 	{
@@ -45,7 +45,7 @@ digraph haokkoz_data_flow
 
 	HaoStarter;
 	HS_GameRunner;
-	ZonesMap [ color = "#AA7755" ];
+	ZonesMap;
 
 	# [ label = "" ];
 
@@ -84,21 +84,21 @@ digraph haokkoz_data_flow
 
 	knowsAirplanes -> CanvasAdapter [ label = "arrived path-change (planemoved)" ];
 	knowsAirplanes -> SchedulesFlights [ label = "arrived" color = "#AA7755" ];
-	knowsAirplanes -> ZonesMap [ label = "arrived" color = "#AA7755" ];
 
 	knowsMap -> CanvasAdapter [ label = "map saved" ];
+	knowsMap -> ZonesMap [ label = "zone these" ];
 
-	MapServiceAdapter -> MapServiceEndpoint [ label = "node-point requests" color = "#AA7755" ];
-	MapServiceAdapter -> ZonesMap [ label = "node-point" color = "#AA7755" ];
+	MapServiceAdapter -> MapServiceEndpoint [ label = "node-point requests" ];
+	MapServiceAdapter -> ZonesMap [ label = "node-point" ];
 
-	MapServiceEndpoint -> MapServiceAdapter [ label = "node-point responses" color = "#AA7755" ];
+	MapServiceEndpoint -> MapServiceAdapter [ label = "node-point responses" ];
 
 	SchedulesFlights -> AirplaneServiceAdapter [ label = "change paths" color = "#AA7755" ];
 
 	stdOutAdapter -> stdOutEndpoint [ label = "strings" ];
 
-	ZonesMap -> MapServiceAdapter [ label = "get nodepoint" color = "#AA7755" ];
-	ZonesMap -> knowsMap [ label = "node zone" color = "#AA7755" ];
+	ZonesMap -> MapServiceAdapter [ label = "get nodepoint" ];
+	ZonesMap -> knowsMap [ label = "node zone" ];
 
 	# ->  [ label = "" ];
 

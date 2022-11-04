@@ -18,6 +18,17 @@ import ws.nzen.game.sim.hao.game.AtcRoutingNode;
 public class NodeMapper
 {
 
+
+	public Node asAtcNode(
+			AtcRoutingNode haoNode
+	) {
+		Node nativeNode = Node.newBuilder()
+				.setLatitude( haoNode.getLatitude() )
+				.setLongitude( haoNode.getLongitude() ).build();
+		return nativeNode;
+	}
+
+
 	public AtcFlightPlan asHaoFlightPlan(
 			List<Node> nativeNodes
 	) {

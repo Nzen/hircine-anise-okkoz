@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ws.nzen.game.sim.hao.game.HaoMessage;
+import ws.nzen.game.sim.hao.service.HaoConstants;
 import ws.nzen.game.sim.hao.uses.any.Quittable;
 import ws.nzen.game.sim.hao.uses.atc.ManagesGameState;
 
@@ -29,7 +30,7 @@ public class GameServiceAdapter implements ManagesGameState, Quittable
 	private static final Logger log = LoggerFactory.getLogger( GameServiceAdapter.class );
 	private boolean quit = false;
 	private final GameServiceEndpoint gameService;
-	private int millisecondsToSleep = 200;
+	private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 	private final Queue<GetGameStateRequest> gameStateRequests;
 	private final Queue<GetGameStateResponse> forGameStateResponses;
 	private final Queue<StartGameRequest> startGameRequests;

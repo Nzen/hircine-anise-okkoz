@@ -10,6 +10,7 @@ import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ws.nzen.game.sim.hao.service.HaoConstants;
 import ws.nzen.game.sim.hao.uses.any.Quittable;
 
 
@@ -24,7 +25,7 @@ public class StdOutEndpoint implements Runnable, Quittable
 	private static final Logger log = LoggerFactory
 			.getLogger( StdOutEndpoint.class );
 	private boolean quit = false;
-	private int millisecondsToSleep = 200;
+	private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 	private final Queue<String> messagesToLog;
 
 

@@ -14,6 +14,7 @@ import atc.v1.Event.StreamRequest;
 import atc.v1.Event.StreamResponse;
 
 import ws.nzen.game.sim.hao.game.*;
+import ws.nzen.game.sim.hao.service.HaoConstants;
 import ws.nzen.game.sim.hao.uses.any.Quittable;
 import ws.nzen.game.sim.hao.uses.atc.RequestsEvents;
 
@@ -30,7 +31,7 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 	private boolean quit = false;
 	private final EventMapper eventMapper;
 	private final EventServiceEndpoint eventService;
-	private int millisecondsToSleep = 200;
+	private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 	private final Queue<AtcEvent> atcEvents;
 	private final Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected;
 	private final Queue<AtcEventGameStarted> gameStartEvents;

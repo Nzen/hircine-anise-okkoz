@@ -13,6 +13,8 @@ import atc.v1.AtcServiceGrpc.AtcServiceStub;
 import io.grpc.Channel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+
+import ws.nzen.game.sim.hao.service.HaoConstants;
 import ws.nzen.game.sim.hao.uses.any.Quittable;
 
 import java.util.Queue;
@@ -34,7 +36,7 @@ public class AtcServiceEndpoint implements Runnable, Quittable
 	private boolean quit = false;
 	private Channel channel;
 	private AtcServiceStub atcService;
-	private int millisecondsToSleep = 200;
+	private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 	private final Queue<GetVersionRequest> versionRequests;
 	private final Queue<GetVersionResponse> versionResponses;
 

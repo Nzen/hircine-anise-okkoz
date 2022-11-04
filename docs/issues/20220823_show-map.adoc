@@ -22,6 +22,25 @@ Shows the nodes, airports, and initial node of arriving airplanes.
 This still needs to show updated flight plans, when they change via the simulation or haokkoz.
 I'll put this on hold to work on i20220918.
 
+=== 2022-10-09
+
+comment author : Nicholas Prado
+
+So, I'm thinking of getting a triangle, or a line (assuming that horizontal and vertical are equidistant) of nodes.
+So, ZonesMap, makes a complicated object for each, or is it enough to check if the nodepoint has a point ?
+
+=== 2022-10-11
+
+comment author : Nicholas Prado
+
+This seems like it zones the nodes, but I haven't checked formally. ZoneMap needs a method like exerciseTriangleSynchronously() and exerciseZoningSynchronously(), so I can test this. Then, write a junit method to test each, geometrically. Then, I can commit this.
+
+=== 2022-11-03
+
+comment author : Nicholas Prado
+
+Able to zone nodes, but does not use these to track airplane movement yet.
+
 ////
 == comments
 === yyyy-MM-dd hh:MM zzz

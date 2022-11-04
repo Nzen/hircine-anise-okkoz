@@ -24,10 +24,13 @@ import ws.nzen.game.sim.hao.game.AtcGameVersion;
 import ws.nzen.game.sim.hao.game.HaoEvent;
 import ws.nzen.game.sim.hao.game.HaoMessage;
 import ws.nzen.game.sim.hao.service.Factory;
+import ws.nzen.game.sim.hao.service.HaoConstants;
 import ws.nzen.game.sim.hao.uses.any.Quittable;
 import ws.nzen.game.sim.hao.uses.atc.KnowsAirplanesRunnably;
 import ws.nzen.game.sim.hao.uses.atc.KnowsAtcVersion;
 import ws.nzen.game.sim.hao.uses.atc.KnowsMapRunnably;
+import ws.nzen.game.sim.hao.uses.atc.KnowsNodes;
+import ws.nzen.game.sim.hao.uses.atc.LocatesNodes;
 import ws.nzen.game.sim.hao.uses.atc.ManagesGameState;
 import ws.nzen.game.sim.hao.uses.atc.RequestsEvents;
 import ws.nzen.game.sim.hao.uses.view.BookendsGames;
@@ -53,6 +56,8 @@ public class HaoStarter
 	private final KnowsAirplanesRunnably knowsAirplanes;
 	private final KnowsAtcVersion knowsAtcVersion;
 	private final KnowsMapRunnably knowsMap;
+	private final KnowsNodes knowsNodes;
+	private final LocatesNodes locatesNodes;
 	private final ManagesGameState gameService;
 	private final RequestsEvents eventService;
 	private final ShowsEvents stdOut;
@@ -64,6 +69,7 @@ public class HaoStarter
 	) {
 		Factory factory = new Factory();
 		threads = Executors.newCachedThreadPool();
+
 		startAndQuit = new GameRunner(
 				factory.queueHaoEventEndGame(),
 				factory.queueHaoMessageStartGame(),
@@ -73,23 +79,37 @@ public class HaoStarter
 				factory.queueAtcEventGameStopped(),
 				factory.queueViewConnected() );
 		threads.execute( startAndQuit );
+
 		knowsAirplanes = factory.knowsAirplanesRunnably();
 		threads.execute( knowsAirplanes );
+
 		knowsAtcVersion = factory.knowsAtcVersion( host, atcPort );
 		threads.execute( knowsAtcVersion );
+
+		knowsNodes = factory.knowsNodes( host, atcPort );
+		threads.execute( knowsNodes );
+
 		gameService = factory.managesGameState( host, atcPort );
 		threads.execute( gameService );
+
 		eventService = factory.requestsEvents( host, atcPort );
 		threads.execute( eventService );
+
 		stdOut = factory.showsEvents();
 		threads.execute( stdOut );
+
 		knowsMap = factory.knowsMap();
 		threads.execute( knowsMap );
+
 		showsMap = factory.showsMap(
 				knowsAirplanes,
 				knowsMap,
 				viewPort );
 		threads.execute( showsMap );
+
+		locatesNodes = factory.locatesNodes();
+		threads.execute( locatesNodes );
+
 		BookendsGames bookendsGames = factory.bookendsGames(
 				knowsAirplanes,
 				knowsMap,
@@ -101,12 +121,15 @@ public class HaoStarter
 
 	public void quit(
 	) {
-		gameService.quit();
-		eventService.quit();
-		stdOut.quit();
-		knowsMap.quit();
-		showsMap.quit();
+		knowsAirplanes.quit();
 		knowsAtcVersion.quit();
+		eventService.quit();
+		gameService.quit();
+		knowsMap.quit();
+		knowsNodes.quit();
+		locatesNodes.quit();
+		showsMap.quit();
+		stdOut.quit();
 		threads.shutdownNow();
 	}
 
@@ -131,17 +154,17 @@ public class HaoStarter
 	private class GameRunner implements Runnable, Quittable
 	{
 
+		private boolean atcListening = false;
 		private boolean quit = false;
-		private int millisecondsToSleep = 200;
+		private boolean viewListening = false;
+		private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 		private final Queue<HaoEvent> endGameEvents;
 		private final Queue<HaoMessage> haoGameStartRequests;
 		private final Queue<AtcGameVersion> atcGameVersions;
 		private final Queue<HaoMessage> checkVersionRequests;
 		private final Queue<HaoMessage> eventStreamRequests;
 		private final Queue<AtcEventGameStopped> atcEventGameStopped;
-		private final Queue<HaoMessage> viewConnected;
-		private boolean atcListening = false;
-		private boolean viewListening = false;
+		private final Queue<HaoMessage> viewConnected;;
 
 
 		public GameRunner(
@@ -165,8 +188,8 @@ public class HaoStarter
 				throw new NullPointerException( "eventStreamRequests must not be null" );
 			if ( atcEventGameStopped == null )
 				throw new NullPointerException( "atcEventGameStopped must not be null" );
-			if ( atcEventGameStopped == null )
-				throw new NullPointerException( "atcEventGameStopped must not be null" );
+			if ( viewConnected == null )
+				throw new NullPointerException( "viewConnected must not be null" );
 			this.endGameEvents = endGameEvents;
 			this.haoGameStartRequests = haoGameStartRequests;
 			this.atcGameVersions = atcGameVersions;
@@ -247,6 +270,8 @@ public class HaoStarter
 
 		void hearViewListening(
 		) {
+			if ( viewListening )
+				return; // ¶ avoid restarting the game if the client view refreshes
 			viewListening = true;
 			maybeStartGame();
 		}
@@ -278,7 +303,7 @@ public class HaoStarter
 		void start(
 		) {
 			haoGameStartRequests.offer( HaoMessage.START_GAME );
-			// FIX only if game is not running, else this will kill the running game
+			// IMPROVE only if game is not running, else this will kill the running game
 		}
 
 

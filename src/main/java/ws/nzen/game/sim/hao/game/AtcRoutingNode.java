@@ -4,6 +4,7 @@
 
 package ws.nzen.game.sim.hao.game;
 
+import java.util.Objects;
 
 /**  */
 public class AtcRoutingNode
@@ -32,6 +33,27 @@ public class AtcRoutingNode
 		this.longitude = longitude;
 		this.latitude = latitude;
 		this.restricted = restricted;
+	}
+
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash( latitude, longitude );
+	}
+
+
+	@Override
+	public boolean equals( Object obj )
+	{
+		if ( this == obj )
+			return true;
+		if ( obj == null )
+			return false;
+		if ( getClass() != obj.getClass() )
+			return false;
+		AtcRoutingNode other = (AtcRoutingNode) obj;
+		return latitude == other.latitude && longitude == other.longitude;
 	}
 
 

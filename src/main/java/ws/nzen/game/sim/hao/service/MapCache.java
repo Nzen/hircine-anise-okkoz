@@ -4,8 +4,11 @@
 
 package ws.nzen.game.sim.hao.service;
 
+import java.awt.Rectangle;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 
@@ -25,6 +28,7 @@ public class MapCache implements SavesMap, KnowsMap
 
 	private AtcMap map = null;
 	private final Queue<HaoEvent> repaintEvents;
+	private Map<AtcRoutingNode, Rectangle> nodeZones = new HashMap<>(); 
 
 
 	public MapCache(
@@ -67,6 +71,13 @@ public class MapCache implements SavesMap, KnowsMap
 			throw new NullPointerException( "map must not be null" );
 		this.map = map;
 		repaintEvents.offer( HaoEvent.MAP_CHANGED );
+	}
+
+
+	public void save(
+			Map<AtcRoutingNode, Rectangle> zones
+	) {
+		nodeZones.putAll( zones );
 	}
 
 

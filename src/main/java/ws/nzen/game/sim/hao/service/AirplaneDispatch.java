@@ -26,8 +26,9 @@ public class AirplaneDispatch implements KnowsAirplanesRunnably
 
 	private static final Logger log = LoggerFactory
 			.getLogger( AirplaneDispatch.class );
+
 	private boolean quit = false;
-	private int millisecondsToSleep = 200;
+	private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 	private final AirplaneCache airplaneCache; // IMPROVE use Knows and Saves Airplanes
 	private final Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected;
 	private final Queue<AtcEventFlightPlanUpdated> aeFlightChanged;

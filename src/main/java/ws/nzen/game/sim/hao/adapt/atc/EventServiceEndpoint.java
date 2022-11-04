@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import io.grpc.Channel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+
+import ws.nzen.game.sim.hao.service.HaoConstants;
 import ws.nzen.game.sim.hao.uses.any.Quittable;
 
 
@@ -33,7 +35,7 @@ public class EventServiceEndpoint implements Runnable, Quittable
 	private boolean quit = false;
 	private Channel channel;
 	private EventServiceStub eventService;
-	private int millisecondsToSleep = 200;
+	private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 	private final Queue<StreamRequest> requests;
 	private final Queue<StreamResponse> responses;
 

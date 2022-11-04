@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import ws.nzen.game.adventure.mhc.message.Move;
 import ws.nzen.game.adventure.mhc.message.Quit;
 import ws.nzen.game.sim.hao.game.*;
+import ws.nzen.game.sim.hao.service.HaoConstants;
 import ws.nzen.game.sim.hao.uses.atc.KnowsAirplanes;
 import ws.nzen.game.sim.hao.uses.atc.KnowsMap;
 import ws.nzen.game.sim.hao.uses.view.BookendsGames;
@@ -34,7 +35,7 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 	private final CanvasEndpoint canvas;
 	private final KnowsAirplanes knowsAirplanes;
 	private final KnowsMap haoMap;
-	private int millisecondsToSleep = 200;
+	private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 	private final Queue<HaoEvent> repaintInput;
 	private final Queue<HaoEvent> endGameOutward;
 	private final Queue<HaoMessage> haoGameStartRequests;

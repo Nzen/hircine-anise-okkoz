@@ -11,6 +11,6 @@ import ws.nzen.game.sim.hao.uses.any.Quittable;
 /**
 
 */
-public interface KnowsMapRunnably extends KnowsMap, Runnable, Quittable
+public interface LocatesNodes extends Runnable, Quittable
 {
 }
