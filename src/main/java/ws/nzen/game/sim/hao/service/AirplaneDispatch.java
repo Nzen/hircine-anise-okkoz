@@ -14,8 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import ws.nzen.game.sim.hao.game.AtcAirplane;
 import ws.nzen.game.sim.hao.game.AtcEventAirplaneDetected;
+import ws.nzen.game.sim.hao.game.AtcEventAirplaneMoved;
 import ws.nzen.game.sim.hao.game.AtcEventFlightPlanUpdated;
 import ws.nzen.game.sim.hao.uses.atc.KnowsAirplanesRunnably;
+import ws.nzen.game.sim.hao.uses.atc.KnowsMap;
 
 
 /**
@@ -31,21 +33,26 @@ public class AirplaneDispatch implements KnowsAirplanesRunnably
 	private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 	private final AirplaneCache airplaneCache; // IMPROVE use Knows and Saves Airplanes
 	private final Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected;
+	private final Queue<AtcEventAirplaneMoved> atcEventsAirplaneMoved;
 	private final Queue<AtcEventFlightPlanUpdated> aeFlightChanged;
 
 
 	public AirplaneDispatch(
 			AirplaneCache airplaneCache,
 			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected,
+			Queue<AtcEventAirplaneMoved> atcEventsAirplaneMoved,
 			Queue<AtcEventFlightPlanUpdated> aeFlightChanged
 	) {
 		if ( airplaneCache == null )
 			throw new NullPointerException( "airplaneCache must not be null" );
 		else if ( atcEventsAirplaneDetected == null )
 			throw new NullPointerException( "atcEventsAirplaneDetected must not be null" );
+		else if ( atcEventsAirplaneMoved == null )
+			throw new NullPointerException( "atcEventsAirplaneMoved must not be null" );
 		else if ( aeFlightChanged == null )
 			throw new NullPointerException( "aeFlightChanged must not be null" );
 		this.atcEventsAirplaneDetected = atcEventsAirplaneDetected;
+		this.atcEventsAirplaneMoved = atcEventsAirplaneMoved;
 		this.airplaneCache = airplaneCache;
 		this.aeFlightChanged = aeFlightChanged;
 	}
@@ -79,6 +86,14 @@ public class AirplaneDispatch implements KnowsAirplanesRunnably
 		{
 			while ( true )
 			{
+				while ( ! atcEventsAirplaneMoved.isEmpty() )
+				{
+					AtcEventAirplaneMoved airplaneEvent = atcEventsAirplaneMoved.poll();
+					airplaneCache.updateAirplaneLocation(
+							airplaneEvent.getAirplaneId(),
+							airplaneEvent.getPosition() );
+				}
+
 				while ( ! atcEventsAirplaneDetected.isEmpty() )
 				{
 					AtcEventAirplaneDetected airplaneEvent = atcEventsAirplaneDetected.poll();
@@ -102,6 +117,14 @@ public class AirplaneDispatch implements KnowsAirplanesRunnably
 		{
 			log.error( ie.toString() );
 		}
+	}
+
+
+	@Override
+	public boolean updateAirplaneNodes(
+			KnowsMap knowsPointsOfNode
+	) {
+		return airplaneCache.updateAirplaneNodes( knowsPointsOfNode );
 	}
 
 

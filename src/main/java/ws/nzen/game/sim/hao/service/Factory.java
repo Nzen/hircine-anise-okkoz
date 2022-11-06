@@ -64,6 +64,7 @@ public class Factory
 		return airplaneDispatch(
 				airplaneCache( queueRepaintHaoEvent() ),
 				queueAtcEventAirplaneDetected(),
+				queueAtcEventAirplaneMoved(),
 				queueAtcEventFlightChanged() );
 	}
 
@@ -153,6 +154,15 @@ public class Factory
 		if ( ! queues.containsKey( name ) )
 			queues.put( name, new ConcurrentLinkedQueue<AtcEventAirplaneDetected>() );
 		return (Queue<AtcEventAirplaneDetected>)queues.get( name );
+	}
+
+
+	public Queue<AtcEventAirplaneMoved> queueAtcEventAirplaneMoved(
+	) {
+		final String name = "queueAtcEventAirplaneMoved";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<AtcEventAirplaneMoved>() );
+		return (Queue<AtcEventAirplaneMoved>)queues.get( name );
 	}
 
 
@@ -444,6 +454,7 @@ public class Factory
 				queueOtherAtcEvent(),
 				queueAtcEventGameStarted(),
 				queueAtcEventAirplaneDetected(),
+				queueAtcEventAirplaneMoved(),
 				queueStartEventStream(),
 				queueAtcEventGameStopped(),
 				queueAtcEventFlightChanged() );
@@ -493,6 +504,7 @@ public class Factory
 	private AirplaneDispatch airplaneDispatch(
 			AirplaneCache airplaneCache,
 			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected,
+			Queue<AtcEventAirplaneMoved> atcEventsAirplaneMoved,
 			Queue<AtcEventFlightPlanUpdated> aeFlightChanged
 	) {
 		Class<?> airplaneDispatchClass = AirplaneDispatch.class;
@@ -503,10 +515,12 @@ public class Factory
 				new AirplaneDispatch(
 						airplaneCache,
 						atcEventsAirplaneDetected,
+						atcEventsAirplaneMoved,
 						aeFlightChanged ) );
 		return airplaneDispatch(
 				airplaneCache,
 				atcEventsAirplaneDetected,
+				atcEventsAirplaneMoved,
 				aeFlightChanged );
 	}
 
@@ -672,6 +686,7 @@ public class Factory
 			Queue<AtcEvent> atcEvents,
 			Queue<AtcEventGameStarted> gameStartEvents,
 			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected,
+			Queue<AtcEventAirplaneMoved> atcEventsAirplaneMoved,
 			Queue<HaoMessage> checkVersionRequests,
 			Queue<AtcEventGameStopped> atcEndedGame,
 			Queue<AtcEventFlightPlanUpdated> aeFlightChanged
@@ -689,6 +704,7 @@ public class Factory
 						atcEvents,
 						gameStartEvents,
 						atcEventsAirplaneDetected,
+						atcEventsAirplaneMoved,
 						checkVersionRequests,
 						atcEndedGame,
 						aeFlightChanged ) );
@@ -700,6 +716,7 @@ public class Factory
 				atcEvents,
 				gameStartEvents,
 				atcEventsAirplaneDetected,
+				atcEventsAirplaneMoved,
 				checkVersionRequests,
 				atcEndedGame,
 				aeFlightChanged );

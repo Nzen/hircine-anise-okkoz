@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import ws.nzen.game.sim.hao.game.AtcEventGameStarted;
 import ws.nzen.game.sim.hao.game.AtcMap;
+import ws.nzen.game.sim.hao.game.AtcMapPoint;
 import ws.nzen.game.sim.hao.game.AtcRoutingNode;
 import ws.nzen.game.sim.hao.game.AtcTeamTag;
 import ws.nzen.game.sim.hao.uses.atc.KnowsMapRunnably;
@@ -68,6 +69,14 @@ public class MapDispatch implements KnowsMapRunnably
 	public Optional<AtcMap> getMap(
 	) {
 		return map.getMap();
+	}
+
+
+	@Override
+	public Optional<AtcRoutingNode> geNodeOf(
+			AtcMapPoint pointwiseLocation
+	) {
+		return map.geNodeOf( pointwiseLocation );
 	}
 
 

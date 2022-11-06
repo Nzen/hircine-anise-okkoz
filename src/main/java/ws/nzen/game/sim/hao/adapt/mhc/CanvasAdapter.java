@@ -131,7 +131,7 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 					HaoEvent message = repaintInput.poll();
 					if ( message == null )
 						break;
-					updateMap();
+					updateMap( message == HaoEvent.AIRPLANE_NODE_CHANGED );
 				}
 
 				while ( ! mhcQuitInput.isEmpty() )
@@ -163,10 +163,14 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 
 
 	public void updateMap(
+			boolean requireNodeChangeForRepaint
 	) {
 		Optional<AtcMap> map = haoMap.getMap();
-		Collection<AtcAirplane> airplanes = knowsAirplanes.findAll();
 		if ( ! map.isPresent() )
+			return;
+		boolean nodeChanged = knowsAirplanes.updateAirplaneNodes( haoMap );
+		Collection<AtcAirplane> airplanes = knowsAirplanes.findAll();
+		if ( requireNodeChangeForRepaint && ! nodeChanged )
 			return;
 		MhcBoard mhcBoard = boardMapper.asMhcBoard( map.get(), airplanes );
 		canvas.updateView( mhcBoard );
@@ -174,3 +178,33 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

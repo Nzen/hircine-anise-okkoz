@@ -13,6 +13,7 @@ public interface ShowsMap extends Runnable, Quittable
 {
 
 	public void updateMap(
+			boolean requireNodeChangeForRepaint
 	);
 
 }

@@ -14,6 +14,7 @@ import java.util.Queue;
 
 import ws.nzen.game.sim.hao.game.AtcAirport;
 import ws.nzen.game.sim.hao.game.AtcMap;
+import ws.nzen.game.sim.hao.game.AtcMapPoint;
 import ws.nzen.game.sim.hao.game.AtcRoutingNode;
 import ws.nzen.game.sim.hao.game.AtcTeamTag;
 import ws.nzen.game.sim.hao.game.HaoEvent;
@@ -61,6 +62,21 @@ public class MapCache implements SavesMap, KnowsMap
 			return Optional.empty();
 		else
 			return Optional.of( map );
+	}
+
+
+	@Override
+	public Optional<AtcRoutingNode> geNodeOf(
+			AtcMapPoint pointwiseLocation
+	) {
+		for ( AtcRoutingNode node : nodeZones.keySet() )
+		{
+			Rectangle zone = nodeZones.get( node );
+			if ( zone.contains(
+					pointwiseLocation.getXx(), pointwiseLocation.getYy() ) )
+				return Optional.of( node );
+		}
+		return Optional.empty();
 	}
 
 

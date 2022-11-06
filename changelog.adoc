@@ -48,6 +48,12 @@ the authors of Haokkoz release this file under the terms of the Apache license v
 
 * i20220823 able to zone nodes
 
+== [0.0-alpha-5.2] - 2022-11-04
+
+=== Changed
+
+* i20220823 repaints canvas with airplane as it moves, in the correct node
+
 ////
 == Unreleased
 

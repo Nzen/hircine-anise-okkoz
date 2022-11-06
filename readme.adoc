@@ -33,9 +33,9 @@ Okkoz is a latinization of numeral 4 in the Proto-Berber language.
 
 == Status
 
-version 0.0-alpha-5.1
+version 0.0-alpha-5.2
 
-image::./docs/demo/hao 0823 20220918 1403.PNG["Picture of ascii style rendering of auto-traffic-control"]
+image::./docs/demo/hao 0823 2022-11-05 2150.PNG["Picture of ascii style rendering of auto-traffic-control"]
 
 == Design
 

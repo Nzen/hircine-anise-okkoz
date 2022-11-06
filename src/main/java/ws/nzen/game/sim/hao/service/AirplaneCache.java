@@ -13,8 +13,11 @@ import java.util.Queue;
 
 import ws.nzen.game.sim.hao.game.AtcAirplane;
 import ws.nzen.game.sim.hao.game.AtcFlightPlan;
+import ws.nzen.game.sim.hao.game.AtcMapPoint;
+import ws.nzen.game.sim.hao.game.AtcRoutingNode;
 import ws.nzen.game.sim.hao.game.HaoEvent;
 import ws.nzen.game.sim.hao.uses.atc.KnowsAirplanes;
+import ws.nzen.game.sim.hao.uses.atc.KnowsMap;
 import ws.nzen.game.sim.hao.uses.atc.SavesAirplanes;
 
 
@@ -60,6 +63,50 @@ public class AirplaneCache implements KnowsAirplanes, SavesAirplanes
 			throw new NullPointerException( "airplane must not be null" );
 		airplanes.put( airplane.getAtcId(), airplane );
 		repaintEventsOutward.offer( HaoEvent.FLIGHT_PLAN_CHANGED );
+	}
+
+
+	public void updateAirplaneLocation(
+			String airplaneId, AtcMapPoint location
+	) {
+		if ( airplaneId == null || airplaneId.isEmpty() )
+			throw new NullPointerException( "airplaneId must not be null" );
+		else if ( location == null )
+			throw new NullPointerException( "location must not be null" );
+
+		Optional<AtcAirplane> maybeAirplane = findById( airplaneId );
+		if ( ! maybeAirplane.isPresent() )
+			return;
+		AtcAirplane airplane = maybeAirplane.get();
+		airplane.setLocation( location );
+		repaintEventsOutward.offer( HaoEvent.AIRPLANE_NODE_CHANGED );
+	}
+
+
+	@Override
+	public boolean updateAirplaneNodes(
+			KnowsMap knowsPointsOfNode
+	) {
+		boolean atLeastOneChanged = false;
+		for ( String airplaneId : airplanes.keySet() )
+		{
+			AtcAirplane airplane = airplanes.get( airplaneId );
+			Optional<AtcRoutingNode> maybeNode = knowsPointsOfNode.geNodeOf(
+					airplane.getLocation() );
+			if ( ! maybeNode.isPresent() )
+				return false;
+			AtcRoutingNode currentNode = airplane.getClosestRoutingNode();
+			AtcRoutingNode closestNode = maybeNode.get();
+			if ( closestNode.equals( currentNode ) )
+			{
+				atLeastOneChanged |= false;
+				continue;
+			}
+			airplane.setClosestRoutingNode( closestNode );
+			atLeastOneChanged |= true;
+			
+		}
+		return atLeastOneChanged;
 	}
 
 

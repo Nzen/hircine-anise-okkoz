@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import ws.nzen.game.sim.hao.game.AtcMap;
+import ws.nzen.game.sim.hao.game.AtcMapPoint;
 import ws.nzen.game.sim.hao.game.AtcRoutingNode;
 import ws.nzen.game.sim.hao.game.AtcTeamTag;
 
@@ -25,6 +26,11 @@ public interface KnowsMap
 
 
 	public Optional<AtcMap> getMap(
+	);
+
+
+	public Optional<AtcRoutingNode> geNodeOf(
+			AtcMapPoint pointwiseLocation
 	);
 
 }
