@@ -63,6 +63,7 @@ public class AirplaneCache implements KnowsAirplanes, SavesAirplanes
 			throw new NullPointerException( "airplane must not be null" );
 		airplanes.put( airplane.getAtcId(), airplane );
 		repaintEventsOutward.offer( HaoEvent.FLIGHT_PLAN_CHANGED );
+System.out.println( "airplane name "+ airplane.getAtcId() +" char "+ airplane.getAtcIdAsSingleCharacter() );
 	}
 
 
@@ -106,7 +107,7 @@ public class AirplaneCache implements KnowsAirplanes, SavesAirplanes
 			atLeastOneChanged |= true;
 			
 		}
-		return atLeastOneChanged;
+		return true; // atLeastOneChanged;
 	}
 
 

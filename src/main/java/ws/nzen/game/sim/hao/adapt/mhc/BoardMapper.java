@@ -5,6 +5,7 @@
 package ws.nzen.game.sim.hao.adapt.mhc;
 
 
+import java.awt.Color;
 import java.awt.Point;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -38,23 +39,34 @@ public class BoardMapper
 		Collection<Entity> entities = new LinkedList<>();
 		int airplaneSeen = 0;
 		final String planeColor = "Silver", flightPlanNodeColor = "DarkGreen", airportColor = "Blue";
+		Color baseFlightPlanColor = new Color( 30, 200, 30 );
+		int mask = 0x00FFFFFF, colorOffset = 10;
+		String hexcodeColorFomat = "#%06x";
 		for ( AtcAirplane airplane : airplanes )
 		{
+			int flightPlanNodes = 0;
 			for ( AtcRoutingNode mapNode : airplane.getFlightPlan().getRoute() )
 			{
+				Color flightPlanColor = new Color(
+						baseFlightPlanColor.getRed() + ( colorOffset * flightPlanNodes ),
+						baseFlightPlanColor.getGreen() - ( colorOffset * flightPlanNodes ),
+						baseFlightPlanColor.getBlue() + ( colorOffset * flightPlanNodes ) );
 				Entity airplaneSprite = new Entity(
 						asAwtPoint( mapNode ),
-						Integer.toString( airplaneSeen ),
-						flightPlanNodeColor,
+						airplane.getAtcIdAsSingleCharacter(),
+						String.format(
+								hexcodeColorFomat,
+								flightPlanColor.getRGB() & mask),
 						airplane.getAtcId() +"-plan",
 						false,
 						null,
 						null );
 				entities.add( airplaneSprite );
+				flightPlanNodes += 1;
 			}
 			Entity airplaneSprite = new Entity(
 					asAwtPoint( airplane.getClosestRoutingNode() ),
-					Integer.toString( airplaneSeen ),
+					airplane.getAtcIdAsSingleCharacter(),
 					planeColor,
 					airplane.getAtcId(),
 					true,
