@@ -21,6 +21,7 @@ import ws.nzen.game.sim.hao.game.*;
 */
 public class BoardMapper
 {
+	private Collection<Entity> oldFlightPlanSprites = new LinkedList<>();
 
 	public Point asAwtPoint(
 			AtcRoutingNode latitudeLongitude
@@ -42,6 +43,9 @@ public class BoardMapper
 				airportColor = "Blue",
 				oldFlightPlanNodeColor = "Black";
 
+		for ( Entity oldFlightPlanNodeSprite : oldFlightPlanSprites )
+			entities.add( oldFlightPlanNodeSprite );
+
 		for ( AtcAirplane airplane : airplanes )
 		{
 			for ( AtcRoutingNode mapNode : airplane.getApprovedFlightPlan().getRoute() )
@@ -55,6 +59,14 @@ public class BoardMapper
 						null,
 						null );
 				entities.add( flightPlanSprite );
+				oldFlightPlanSprites.add( new Entity(
+						asAwtPoint( mapNode ),
+						airplaneIdentifier( airplane ),
+						oldFlightPlanNodeColor,
+						airplane.getAtcId() +"-plan",
+						false,
+						null,
+						null ) );
 			}
 			Entity airplaneSprite = new Entity(
 					asAwtPoint( airplane.getClosestRoutingNode() ),
