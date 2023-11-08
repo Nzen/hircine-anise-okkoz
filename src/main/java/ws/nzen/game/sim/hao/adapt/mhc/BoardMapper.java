@@ -27,7 +27,7 @@ public class BoardMapper
 	) {
 		return new Point(
 				latitudeLongitude.getLongitude() +11,
-				latitudeLongitude.getLatitude() +8 );
+				Math.abs( latitudeLongitude.getLatitude() -8 ) );
 	}
 
 
@@ -37,24 +37,28 @@ public class BoardMapper
 		Point maxMapDim = new Point( 23, 17 );
 		Collection<Entity> entities = new LinkedList<>();
 		int airplaneSeen = 0;
-		final String planeColor = "Silver", flightPlanNodeColor = "DarkGreen", airportColor = "Blue";
+		final String planeColor = "Silver",
+				flightPlanNodeColor = "DarkGreen",
+				airportColor = "Blue",
+				oldFlightPlanNodeColor = "Black";
+
 		for ( AtcAirplane airplane : airplanes )
 		{
-			for ( AtcRoutingNode mapNode : airplane.getFlightPlan().getRoute() )
+			for ( AtcRoutingNode mapNode : airplane.getApprovedFlightPlan().getRoute() )
 			{
-				Entity airplaneSprite = new Entity(
+				Entity flightPlanSprite = new Entity(
 						asAwtPoint( mapNode ),
-						Integer.toString( airplaneSeen ),
+						airplaneIdentifier( airplane ),
 						flightPlanNodeColor,
 						airplane.getAtcId() +"-plan",
 						false,
 						null,
 						null );
-				entities.add( airplaneSprite );
+				entities.add( flightPlanSprite );
 			}
 			Entity airplaneSprite = new Entity(
 					asAwtPoint( airplane.getClosestRoutingNode() ),
-					Integer.toString( airplaneSeen ),
+					airplaneIdentifier( airplane ),
 					planeColor,
 					airplane.getAtcId(),
 					true,
@@ -91,4 +95,23 @@ public class BoardMapper
 				entities );
 	}
 
+
+	private String airplaneIdentifier(
+			AtcAirplane airplane
+	) {
+		String withoutTextualPart = airplane.getAtcId().substring( "AT-".length() );
+		int rawId = Integer.parseInt( withoutTextualPart );
+		Character baseChar = '\'';
+		Character offsetChar = Character.valueOf( (char)( baseChar.charValue() + rawId ) );
+		return offsetChar.toString();
+	}
+
+
 }
+
+
+
+
+
+
+
