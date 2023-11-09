@@ -4,7 +4,7 @@
 == Honor user input
 
 * assignee : Nicholas Prado
-* status : in progress
+* status : complete
 * priority : high
 
 Currently, the program operates naively.
@@ -51,6 +51,16 @@ comment author : Nicholas Prado
 I will remove the Adapter to Endpoint queues from HaoStarter.
 Factory can be responsible for creating these.
 I will sever any queues that stretch from an Endpoint or to an Endpoint that aren't to an adapter (ex GameServiceEndpoint to CoalesceBlobs).
+
+=== 2023-11-09
+
+comment author : Nicholas Prado
+
+This is done, given that the game quits when the simulation is halts and the web page can quit early, though I have no idea why I would want to.
+
+I was inclined hold this open to allow the web page to restart the game client.
+However, that is a separate issue.
+The current situation is adequate for the time being, given that I'm mostly inclined to stop, edit, and restart the game to improve the client.
 
 ////
 == comments
