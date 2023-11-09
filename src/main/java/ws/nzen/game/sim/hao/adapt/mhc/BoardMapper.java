@@ -112,7 +112,7 @@ public class BoardMapper
 			AtcAirplane airplane
 	) {
 		String withoutTextualPart = airplane.getAtcId().substring( "AT-".length() );
-		int rawId = Integer.parseInt( withoutTextualPart );
+		int rawId = Integer.parseInt( withoutTextualPart ) %90; // ¶ for visible ascii char range
 		Character baseChar = '\'';
 		Character offsetChar = Character.valueOf( (char)( baseChar.charValue() + rawId ) );
 		return offsetChar.toString();

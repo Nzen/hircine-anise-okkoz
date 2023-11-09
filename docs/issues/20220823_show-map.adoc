@@ -8,6 +8,7 @@
 * priority : medium
 
 Retrieve the map from the game and show it in some form, to visually validate success.
+Update the airplane node, as it moves.
 
 Consider letting the viewing person choose the visual elements to show: flight plan, legend of airplanes.
 The latter assumes a different icon for each airplane.
@@ -39,7 +40,21 @@ This seems like it zones the nodes, but I haven't checked formally. ZoneMap need
 
 comment author : Nicholas Prado
 
-Able to zone nodes, but does not use these to track airplane movement yet.
+Able to zone nodes, but does not use these to track airplane movement, yet.
+
+=== 2023-11-08
+
+comment author : Nicholas Prado
+
+Ensured that the airplane character does not change between updates.
+Retains the old path of the plane, so it is easier to see where it has been.
+
+These rectangles deny containing the points of the airplanes.
+Looking at the game itself, that makes sense, given that they spawn at least one node away from the closest game node.
+
+However, a consulting party suggested that haokkoz calculate the closest node, rather than store rectangles representing the area around a node.
+Indeed, it currently iterated over every node's rectangle, rather than starting in one close by. I would probably need to set up some sort of quad tree (given that these are balanced) to search efficiently.
+But, they are so regular, that is unnecessary overhead.
 
 ////
 == comments
