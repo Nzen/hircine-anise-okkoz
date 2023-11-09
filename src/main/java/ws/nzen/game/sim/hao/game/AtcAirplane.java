@@ -4,6 +4,7 @@
 
 package ws.nzen.game.sim.hao.game;
 
+import java.util.LinkedList;
 
 /**
 
@@ -11,7 +12,8 @@ package ws.nzen.game.sim.hao.game;
 public class AtcAirplane
 {
 
-	private AtcFlightPlan flightPlan;
+	private AtcFlightPlan approvedFlightPlan;
+	private AtcFlightPlan proposedFlightPlan;
 	private AtcMapPoint location;
 	private AtcRoutingNode closestRoutingNode; // FIX have boardMapper ask the KnowsMap for node
 	private final AtcTeamTag team;
@@ -38,33 +40,52 @@ public class AtcAirplane
 			throw new NullPointerException( "flightPlan must not be null" );
 		else if ( location == null )
 			throw new NullPointerException( "location must not be null" );
-		/*
-		else if ( closestRoutingNode == null )
-			throw new NullPointerException( "closestRoutingNode must not be null" );
-		*/
 		else if ( team == null )
 			throw new NullPointerException( "team must not be null" );
 		if ( atcId.isEmpty() )
 			throw new IllegalArgumentException( "atcId must have text" );
 
-		this.flightPlan = flightPlan;
+		this.approvedFlightPlan = flightPlan;
 		this.location = location;
 		this.closestRoutingNode = closestRoutingNode;
 		this.team = team;
 		this.atcId = atcId;
+
+		proposedFlightPlan = new AtcFlightPlan( new LinkedList<>() );
 	}
 
 
-	public AtcFlightPlan getFlightPlan(
+	public void approveProvisionalFlightPlan(
 	) {
-		return flightPlan;
+		approvedFlightPlan = proposedFlightPlan;
 	}
 
 
-	public void setFlightPlan(
+	public AtcFlightPlan getApprovedFlightPlan(
+	) {
+		return approvedFlightPlan;
+	}
+
+
+	public void setApprovedFlightPlan(
 			AtcFlightPlan flightPlan
 	) {
-		this.flightPlan = flightPlan;
+		this.approvedFlightPlan = flightPlan;
+	}
+
+
+	
+	public AtcFlightPlan getProposedFlightPlan(
+	) {
+		return proposedFlightPlan;
+	}
+
+
+	
+	public void setProposedFlightPlan(
+			AtcFlightPlan proposedFlightPlan
+	) {
+		this.proposedFlightPlan = proposedFlightPlan;
 	}
 
 

@@ -4,6 +4,7 @@
 
 package ws.nzen.game.sim.hao.service;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,8 +13,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 
+import ws.nzen.game.sim.hao.adapt.atc.PointMapper;
 import ws.nzen.game.sim.hao.game.AtcAirport;
 import ws.nzen.game.sim.hao.game.AtcMap;
+import ws.nzen.game.sim.hao.game.AtcMapPoint;
 import ws.nzen.game.sim.hao.game.AtcRoutingNode;
 import ws.nzen.game.sim.hao.game.AtcTeamTag;
 import ws.nzen.game.sim.hao.game.HaoEvent;
@@ -28,15 +31,36 @@ public class MapCache implements SavesMap, KnowsMap
 
 	private AtcMap map = null;
 	private final Queue<HaoEvent> repaintEvents;
-	private Map<AtcRoutingNode, Rectangle> nodeZones = new HashMap<>(); 
+	private Map<AtcRoutingNode, Rectangle> nodeZones = new HashMap<>();
+	private PointMapper pointMapper;
 
 
 	public MapCache(
+			PointMapper pointMapper,
 			Queue<HaoEvent> repaintEvents
 	) {
 		if ( repaintEvents == null )
 			throw new NullPointerException( "repaintEvents must not be null" );
+		if ( pointMapper == null )
+			throw new NullPointerException( "pointMapper must not be null" );
 		this.repaintEvents = repaintEvents;
+		this.pointMapper = pointMapper;
+	}
+
+
+	public AtcRoutingNode closestNode(
+			AtcMapPoint position
+	) {
+		/*
+		consider just estimating based on distance each time, rather than storing rectangles
+		 */
+		Point pointOnMap = pointMapper.asAwtPoint( position );
+		for ( AtcRoutingNode node : nodeZones.keySet() ) {
+			Rectangle area = nodeZones.get( node );
+			if ( area.contains( pointOnMap ) )
+				return node;
+		}
+		return new AtcRoutingNode( Integer.MIN_VALUE, Integer.MIN_VALUE, true );
 	}
 
 

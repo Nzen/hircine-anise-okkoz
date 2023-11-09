@@ -4,7 +4,7 @@
 == Land planes
 
 * assignee : Nicholas Prado
-* status : to do
+* status : in progress
 * priority : medium
 
 Ensure that Haokkoz can land planes at their respective airports.
@@ -22,7 +22,24 @@ What a pain that didn't need to be put on the client.
 .  uses/hao/ParcelMap
 .  app/service/MapsNodePixels
 .  saving new map creates a 'parcel map' message
-.  queue from mapcache to mapsnodepixels (or is it to map service ?)
+.  queue from MapCache to MapsNodePixels (or is it to map service ?)
+
+=== 2023-11-09
+
+comment author : Nicholas Prado
+
+Airplanes now store their accepted and proposed plan.
+The distinction stems from the idea that the game might reject the proposed plan, so any routing should only account for the accepted plan.
+
+At this moment, AirplaneDispatch prepares a simple plan that moves directly away from the nearest wall in a cardinal direction.
+(I would like to avoid moving planes diagonally, though it is valid, to avoid complicating my routing by requiring different flight speeds.)
+
+At this time, I plan to only generate a new flight plan when the airplane is close to its final node.
+That way, I don't need to worry about routing around the accepted and proposed plan.
+
+I am inclined to simplify the routing simulation by generating a distance map for each airport.
+They aren't changing, so the routing algorithm can try to move closer or, at least, not farther from the destination.
+
 
 ////
 == comments

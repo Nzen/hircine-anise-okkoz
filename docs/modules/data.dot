@@ -1,0 +1,175 @@
+
+digraph haokkoz_data_relationships
+{
+	bgcolor = "#AAAAAA"
+
+	node [ shape = record ];
+
+	edge [ arrowhead=crow ];
+
+	airplane [ label = <
+			<table>
+				<tr><td align = "center">
+					airplane
+					</td></tr>
+				<tr><td align = "left">
+					id
+					</td></tr>
+				<tr><td align = "left">
+					point
+					</td></tr>
+				<tr><td align = "left">
+					tag
+					</td></tr>
+				<tr><td align = "left">
+					node(s)
+					</td></tr>
+				</table>
+			>];
+
+	airport [ label = <
+			<table>
+				<tr><td align = "center">
+					airport
+					</td></tr>
+				<tr><td align = "left">
+					node
+					</td></tr>
+				<tr><td align = "left">
+					tag
+					</td></tr>
+				</table>
+			>];
+
+	atcnode [ label = <
+			<table>
+				<tr><td align = "center">
+					node
+					</td></tr>
+				<tr><td align = "left">
+					longitude
+					</td></tr>
+				<tr><td align = "left">
+					latitude
+					</td></tr>
+				<tr><td align = "left">
+					restricted
+					</td></tr>
+				</table>
+			>];
+
+	game [ label = <
+			<table>
+				<tr><td align = "center">
+					game
+					</td></tr>
+				<tr><td align = "left">
+					version
+					</td></tr>
+				</table>
+			>];
+
+	gameVersion [ label = <
+			<table>
+				<tr><td align = "center">
+					game version
+					</td></tr>
+				<tr><td align = "left">
+					major
+					</td></tr>
+				<tr><td align = "left">
+					minor
+					</td></tr>
+				<tr><td align = "left">
+					patch
+					</td></tr>
+				<tr><td align = "left">
+					(prerelease)
+					</td></tr>
+				</table>
+			>];
+
+	map [ label = <
+			<table>
+				<tr><td align = "center">
+					map
+					</td></tr>
+				<tr><td align = "left">
+					width
+					</td></tr>
+				<tr><td align = "left">
+					height
+					</td></tr>
+				<tr><td align = "left">
+					node(s)
+					</td></tr>
+				<tr><td align = "left">
+					airport(s)
+					</td></tr>
+				</table>
+			>];
+
+	point [ label = <
+			<table>
+				<tr><td align = "center">
+					point
+					</td></tr>
+				<tr><td align = "left">
+					x
+					</td></tr>
+				<tr><td align = "left">
+					y
+					</td></tr>
+				</table>
+			>];
+
+	tag;
+
+	airplane -> atcnode;
+	airplane -> tag;
+	airplane -> point;
+
+	game -> gameVersion;
+
+	map -> airport;
+	map -> atcnode;
+
+	airport -> atcnode;
+	airport -> tag;
+
+
+/*
+
+	 [ label = <
+			<table>
+				<tr><td align = "center">
+					
+					</td></tr>
+				<tr><td align = "left">
+					
+					</td></tr>
+				</table>
+			>];
+
+	 -> ;
+
+	 ->  [ label = "" ];
+*/
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

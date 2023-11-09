@@ -9,7 +9,7 @@ digraph haokkoz_data_flow
 	{
 		rank = same;
 		AtcServiceEndpoint [ shape = invhouse ]; # for game version
-		AirplaneServiceEndpoint [ shape = invhouse color = "#AA7755" ]; # for updating flight plans
+		AirplaneServiceEndpoint [ shape = invhouse ]; # for updating flight plans
 		MapServiceEndpoint [ shape = invhouse ]; # for node to point conversion
 		eventServiceEndpoint [ shape = invhouse ]; # for events
 		gameServiceEndpoint [ shape = invhouse ]; # to start games
@@ -23,7 +23,7 @@ digraph haokkoz_data_flow
 
 	{
 		rank = same;
-		AirplaneServiceAdapter [ color = "#AA7755" ];
+		AirplaneServiceAdapter;
 		AtcServiceAdapter;
 		eventServiceAdapter;
 		gameServiceAdapter;
@@ -40,7 +40,6 @@ digraph haokkoz_data_flow
 		rank = same;
 		knowsAirplanes [ label = "kA (AirplaneDispatch)" ];
 		knowsMap [ label = "kM (MapDispatch)" ];
-		SchedulesFlights [ color = "#AA7755" ];
 	}
 
 	HaoStarter;
@@ -49,9 +48,10 @@ digraph haokkoz_data_flow
 
 	# [ label = "" ];
 
-	AirplaneServiceAdapter -> AirplaneServiceEndpoint [ label = "path requests" color = "#AA7755" ];
+	AirplaneServiceAdapter -> AirplaneServiceEndpoint [ label = "path requests" ];
+	AirplaneServiceAdapter -> knowsAirplanes [ label = "plan approved | rejected" ];
 
-	AirplaneServiceEndpoint -> AirplaneServiceAdapter [ label = "path responses" color = "#AA7755" ];
+	AirplaneServiceEndpoint -> AirplaneServiceAdapter [ label = "path responses" ];
 
 	AtcServiceAdapter -> AtcServiceEndpoint [ label = "game version requests" ];
 	AtcServiceAdapter -> HS_GameRunner [ label = "game version" ];
@@ -64,9 +64,9 @@ digraph haokkoz_data_flow
 	CanvasAdapter -> HS_GameRunner [ label = "hao quit, ~startGame" ];
 
 	eventServiceAdapter -> eventServiceEndpoint [ label = "stream request" ];
-	eventServiceAdapter -> knowsMap [ label = "gameStart" ];
+	eventServiceAdapter -> knowsMap [ label = "gameStart | plane moved" ];
 	eventServiceAdapter -> stdOutAdapter [ label = "other atcEvents" ];
-	eventServiceAdapter -> knowsAirplanes [ label = "Arrived flightchanged (moved px)" ];
+	eventServiceAdapter -> knowsAirplanes [ label = "Arrived | fpath changed" ];
 	eventServiceAdapter -> HS_GameRunner [ label = "game ended" color = "red" ];
 
 	eventServiceEndpoint -> eventServiceAdapter [ label = "s responses" ];
@@ -82,10 +82,11 @@ digraph haokkoz_data_flow
 
 	gameServiceEndpoint -> gameServiceAdapter [ label = "sg gs response" ];
 
-	knowsAirplanes -> CanvasAdapter [ label = "arrived path-change (planemoved)" ];
-	knowsAirplanes -> SchedulesFlights [ label = "arrived" color = "#AA7755" ];
+	knowsAirplanes -> CanvasAdapter [ label = "arrived | path-change" ];
+	knowsAirplanes -> AirplaneServiceAdapter [ label = "change paths (arrived)" ];
 
 	knowsMap -> CanvasAdapter [ label = "map saved" ];
+	knowsMap -> knowsAirplanes [ label = "airplane moved" ];
 	knowsMap -> ZonesMap [ label = "zone these" ];
 
 	MapServiceAdapter -> MapServiceEndpoint [ label = "node-point requests" ];
@@ -93,12 +94,10 @@ digraph haokkoz_data_flow
 
 	MapServiceEndpoint -> MapServiceAdapter [ label = "node-point responses" ];
 
-	SchedulesFlights -> AirplaneServiceAdapter [ label = "change paths" color = "#AA7755" ];
-
 	stdOutAdapter -> stdOutEndpoint [ label = "strings" ];
 
 	ZonesMap -> MapServiceAdapter [ label = "get nodepoint" ];
-	ZonesMap -> knowsMap [ label = "node zone" ];
+	ZonesMap -> knowsMap [ label = "node zoned" ];
 
 	# ->  [ label = "" ];
 

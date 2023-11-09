@@ -27,7 +27,7 @@ import ws.nzen.game.sim.hao.uses.atc.KnowsNodes;
 /**  */
 public class MapServiceAdapter implements KnowsNodes
 {
-	
+
 	private static final Logger log = LoggerFactory.getLogger( MapServiceAdapter.class );
 
 	private boolean quit = false;

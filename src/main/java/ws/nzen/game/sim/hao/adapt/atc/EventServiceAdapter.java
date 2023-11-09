@@ -34,12 +34,13 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 	private int millisecondsToSleep = HaoConstants.queueDelayMilliseconds;
 	private final Queue<AtcEvent> atcEvents;
 	private final Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected;
+	private final Queue<AtcEventAirplaneMoved> queueEventsAirplaneMoved;
+	private final Queue<AtcEventFlightPlanUpdated> aeFlightChanged;
 	private final Queue<AtcEventGameStarted> gameStartEvents;
+	private final Queue<AtcEventGameStopped> atcEndedGame;
 	private final Queue<StreamRequest> requests;
 	private final Queue<StreamResponse> responses;
 	private final Queue<HaoMessage> startStreamRequests;
-	private final Queue<AtcEventGameStopped> atcEndedGame;
-	private final Queue<AtcEventFlightPlanUpdated> aeFlightChanged;
 	private final Thread runsEventService;
 
 
@@ -51,6 +52,7 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 			Queue<AtcEvent> atcEvents,
 			Queue<AtcEventGameStarted> gameStartEvents,
 			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected,
+			Queue<AtcEventAirplaneMoved> queueEventsAirplaneMoved,
 			Queue<HaoMessage> startStreamRequests,
 			Queue<AtcEventGameStopped> atcEndedGame,
 			Queue<AtcEventFlightPlanUpdated> aeFlightChanged
@@ -67,6 +69,8 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 			throw new NullPointerException( "mapper must not be null" );
 		else if ( atcEventsAirplaneDetected == null )
 			throw new NullPointerException( "atcEventsAirplaneDetected must not be null" );
+		else if ( queueEventsAirplaneMoved == null )
+			throw new NullPointerException( "queueEventsAirplaneMoved must not be null" );
 		else if ( startStreamRequests == null )
 			throw new NullPointerException( "startStreamRequests must not be null" );
 		else if ( atcEndedGame == null )
@@ -79,6 +83,7 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 		this.atcEvents = atcEvents;
 		this.gameStartEvents = gameStartEvents;
 		this.atcEventsAirplaneDetected = atcEventsAirplaneDetected;
+		this.queueEventsAirplaneMoved = queueEventsAirplaneMoved;
 		this.startStreamRequests = startStreamRequests;
 		this.atcEndedGame = atcEndedGame;
 		this.aeFlightChanged = aeFlightChanged;
@@ -118,6 +123,8 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 						atcEndedGame.offer( (AtcEventGameStopped)event );
 					else if ( event.getType() == AtcEventType.FLIGHT_PLAN_UPDATED )
 						aeFlightChanged.offer( (AtcEventFlightPlanUpdated)event );
+					else if ( event.getType() == AtcEventType.AIRPLANE_MOVED )
+						queueEventsAirplaneMoved.offer( (AtcEventAirplaneMoved)event );
 					else
 						atcEvents.offer( event );
 				}

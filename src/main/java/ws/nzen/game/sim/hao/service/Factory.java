@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import atc.v1.AirplaneOuterClass.UpdateFlightPlanRequest;
+import atc.v1.AirplaneOuterClass.UpdateFlightPlanResponse;
 import atc.v1.Atc.GetVersionRequest;
 import atc.v1.Atc.GetVersionResponse;
 import atc.v1.Event.*;
@@ -64,7 +66,11 @@ public class Factory
 		return airplaneDispatch(
 				airplaneCache( queueRepaintHaoEvent() ),
 				queueAtcEventAirplaneDetected(),
-				queueAtcEventFlightChanged() );
+				queueAtcEventFlightChanged(),
+				queueAtcFlightPlanRequest(),
+				queueAtcFlightPlanResponse(),
+				queueRepaintHaoEvent(),
+				queueHaoEventAirplaneMoved() );
 	}
 
 
@@ -109,9 +115,12 @@ public class Factory
 	public KnowsMapRunnably knowsMap(
 	) {
 		return mapDispatch(
+				pointMapper(),
+				queueAtcEventAirplaneMoved(),
 				queueAtcEventGameStarted(),
 				queueRepaintHaoEvent(),
 				queueNodesToZone(),
+				queueHaoEventAirplaneMoved(),
 				queueZonedNodes() );
 	}
 
@@ -156,6 +165,15 @@ public class Factory
 	}
 
 
+	public Queue<AtcEventAirplaneMoved> queueAtcEventAirplaneMoved(
+	) {
+		final String name = "queueAtcEventAirplaneMoved";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<AtcEventAirplaneMoved>() );
+		return (Queue<AtcEventAirplaneMoved>)queues.get( name );
+	}
+
+
 	public Queue<AtcEventFlightPlanUpdated> queueAtcEventFlightChanged(
 	) {
 		final String name = "queueAtcEventFlightChanged";
@@ -180,6 +198,24 @@ public class Factory
 		if ( ! queues.containsKey( name ) )
 			queues.put( name, new ConcurrentLinkedQueue<AtcEventGameStopped>() );
 		return (Queue<AtcEventGameStopped>)queues.get( name );
+	}
+
+
+	public Queue<AtcFlightPlanRequest> queueAtcFlightPlanRequest(
+	) {
+		final String name = "queueAtcFlightPlanRequest";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<AtcFlightPlanRequest>() );
+		return (Queue<AtcFlightPlanRequest>)queues.get( name );
+	}
+
+
+	public Queue<AtcFlightPlanResponse> queueAtcFlightPlanResponse(
+	) {
+		final String name = "queueAtcFlightPlanResponse";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<AtcFlightPlanResponse>() );
+		return (Queue<AtcFlightPlanResponse>)queues.get( name );
 	}
 
 
@@ -261,6 +297,15 @@ public class Factory
 		if ( ! queues.containsKey( name ) )
 			queues.put( name, new ConcurrentLinkedQueue<GetVersionResponse>() );
 		return (Queue<GetVersionResponse>)queues.get( name );
+	}
+
+
+	public Queue<HaoEventAirplaneMoved> queueHaoEventAirplaneMoved(
+	) {
+		final String name = "queueHaoEventAirplaneMoved";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<HaoEventAirplaneMoved>() );
+		return (Queue<HaoEventAirplaneMoved>)queues.get( name );
 	}
 
 
@@ -408,6 +453,24 @@ public class Factory
 	}
 
 
+	public Queue<UpdateFlightPlanRequest> queueUpdateFlightPlanRequest(
+	) {
+		final String name = "queueUpdateFlightPlanRequest";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<UpdateFlightPlanRequest>() );
+		return (Queue<UpdateFlightPlanRequest>)queues.get( name );
+	}
+
+
+	public Queue<UpdateFlightPlanResponse> queueUpdateFlightPlanResponse(
+	) {
+		final String name = "queueUpdateFlightPlanResponse";
+		if ( ! queues.containsKey( name ) )
+			queues.put( name, new ConcurrentLinkedQueue<UpdateFlightPlanResponse>() );
+		return (Queue<UpdateFlightPlanResponse>)queues.get( name );
+	}
+
+
 	public Queue<HaoMessage> queueViewConnected(
 	) {
 		final String name = "queueViewConnected";
@@ -415,15 +478,17 @@ public class Factory
 			queues.put( name, new ConcurrentLinkedQueue<HaoMessage>() );
 		return (Queue<HaoMessage>)queues.get( name );
 	}
+
+
 /*
 
 
-	public Queue<> queue(
+	public Queue<REPLACE> queue REPLACEANDDELETESPACE(
 	) {
-		final String name = "queue";
+		final String name = "queue REPLACEANDDELETESPACE";
 		if ( ! queues.containsKey( name ) )
-			queues.put( name, new ConcurrentLinkedQueue<>() );
-		return (Queue<>)queues.get( name );
+			queues.put( name, new ConcurrentLinkedQueue<REPLACE>() );
+		return (Queue<REPLACE>)queues.get( name );
 	}
 */
 
@@ -444,6 +509,7 @@ public class Factory
 				queueOtherAtcEvent(),
 				queueAtcEventGameStarted(),
 				queueAtcEventAirplaneDetected(),
+				queueAtcEventAirplaneMoved(),
 				queueStartEventStream(),
 				queueAtcEventGameStopped(),
 				queueAtcEventFlightChanged() );
@@ -479,6 +545,24 @@ public class Factory
 	}
 
 
+	public VetsFlightPlans vetsFlightPlans(
+			String host,
+			int port
+	) {
+		return airplaneServiceAdapter(
+				airplaneServiceEndpoint(
+						host,
+						port,
+						queueUpdateFlightPlanRequest(),
+						queueUpdateFlightPlanResponse() ),
+				nodeMapper(),
+				queueUpdateFlightPlanRequest(),
+				queueUpdateFlightPlanResponse(),
+				queueAtcFlightPlanRequest(),
+				queueAtcFlightPlanResponse() );
+	}
+
+
 	private AirplaneCache airplaneCache(
 			Queue<HaoEvent> repaintEvents
 	) {
@@ -493,7 +577,11 @@ public class Factory
 	private AirplaneDispatch airplaneDispatch(
 			AirplaneCache airplaneCache,
 			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected,
-			Queue<AtcEventFlightPlanUpdated> aeFlightChanged
+			Queue<AtcEventFlightPlanUpdated> aeFlightChanged,
+			Queue<AtcFlightPlanRequest> haoFlightPlanRequests,
+			Queue<AtcFlightPlanResponse> haoFlightPlanResponses,
+			Queue<HaoEvent> repaintEvents,
+			Queue<HaoEventAirplaneMoved> queuePlanePositionAndNode
 	) {
 		Class<?> airplaneDispatchClass = AirplaneDispatch.class;
 		if ( instances.containsKey( airplaneDispatchClass ) )
@@ -503,11 +591,19 @@ public class Factory
 				new AirplaneDispatch(
 						airplaneCache,
 						atcEventsAirplaneDetected,
-						aeFlightChanged ) );
+						aeFlightChanged,
+						haoFlightPlanRequests,
+						haoFlightPlanResponses,
+						repaintEvents,
+						queuePlanePositionAndNode ) );
 		return airplaneDispatch(
 				airplaneCache,
 				atcEventsAirplaneDetected,
-				aeFlightChanged );
+				aeFlightChanged,
+				haoFlightPlanRequests,
+				haoFlightPlanResponses,
+				repaintEvents,
+				queuePlanePositionAndNode );
 	}
 
 
@@ -535,6 +631,60 @@ public class Factory
 				airportMapperClass,
 				new AirportMapper( nodeMapper(), tagMapper() ) );
 		return airportMapper();
+	}
+
+
+	private AirplaneServiceAdapter airplaneServiceAdapter(
+			AirplaneServiceEndpoint airplaneServiceEndpoint,
+			NodeMapper nodeMapper,
+			Queue<UpdateFlightPlanRequest> atcFlightPlanRequests,
+			Queue<UpdateFlightPlanResponse> atcFlightPlanResponses,
+			Queue<AtcFlightPlanRequest> haoFlightPlanRequests,
+			Queue<AtcFlightPlanResponse> haoFlightPlanResponses
+	) {
+		Class<?> airplaneServiceAdapterClass = AirplaneServiceAdapter.class;
+		if ( instances.containsKey( airplaneServiceAdapterClass ) )
+			return (AirplaneServiceAdapter)instances.get( airplaneServiceAdapterClass );
+		else {
+			instances.put( airplaneServiceAdapterClass, new AirplaneServiceAdapter(
+					airplaneServiceEndpoint,
+					nodeMapper,
+					atcFlightPlanRequests,
+					atcFlightPlanResponses,
+					haoFlightPlanRequests,
+					haoFlightPlanResponses ) );
+			return airplaneServiceAdapter(
+					airplaneServiceEndpoint,
+					nodeMapper,
+					atcFlightPlanRequests,
+					atcFlightPlanResponses,
+					haoFlightPlanRequests,
+					haoFlightPlanResponses );
+		}
+	}
+
+
+	private AirplaneServiceEndpoint airplaneServiceEndpoint(
+			String host,
+			int port,
+			Queue<UpdateFlightPlanRequest> flightPlanRequests,
+			Queue<UpdateFlightPlanResponse> flightPlanResponses
+	) {
+		Class<?> airplaneServiceEndpointClass = AirplaneServiceEndpoint.class;
+		if ( instances.containsKey( airplaneServiceEndpointClass ) )
+			return (AirplaneServiceEndpoint)instances.get( airplaneServiceEndpointClass );
+		else {
+			instances.put( airplaneServiceEndpointClass, new AirplaneServiceEndpoint(
+					host,
+					port,
+					flightPlanRequests,
+					flightPlanResponses ) );
+			return airplaneServiceEndpoint(
+					host,
+					port,
+					flightPlanRequests,
+					flightPlanResponses );
+		}
 	}
 
 
@@ -672,6 +822,7 @@ public class Factory
 			Queue<AtcEvent> atcEvents,
 			Queue<AtcEventGameStarted> gameStartEvents,
 			Queue<AtcEventAirplaneDetected> atcEventsAirplaneDetected,
+			Queue<AtcEventAirplaneMoved> queueEventsAirplaneMoved,
 			Queue<HaoMessage> checkVersionRequests,
 			Queue<AtcEventGameStopped> atcEndedGame,
 			Queue<AtcEventFlightPlanUpdated> aeFlightChanged
@@ -689,6 +840,7 @@ public class Factory
 						atcEvents,
 						gameStartEvents,
 						atcEventsAirplaneDetected,
+						queueEventsAirplaneMoved,
 						checkVersionRequests,
 						atcEndedGame,
 						aeFlightChanged ) );
@@ -700,6 +852,7 @@ public class Factory
 				atcEvents,
 				gameStartEvents,
 				atcEventsAirplaneDetected,
+				queueEventsAirplaneMoved,
 				checkVersionRequests,
 				atcEndedGame,
 				aeFlightChanged );
@@ -819,6 +972,7 @@ public class Factory
 
 
 	private MapCache mapCache(
+			PointMapper pointMapper,
 			Queue<HaoEvent> repaintEvents
 	) {
 		Class<?> mapCacheClass = MapCache.class;
@@ -826,29 +980,36 @@ public class Factory
 			return (MapCache)instances.get( mapCacheClass );
 		instances.put(
 				mapCacheClass,
-				new MapCache( repaintEvents ) );
-		return mapCache( repaintEvents );
+				new MapCache( pointMapper, repaintEvents ) );
+		return mapCache( pointMapper, repaintEvents );
 	}
 
 
 	private MapDispatch mapDispatch(
+			PointMapper pointMapper,
+			Queue<AtcEventAirplaneMoved> queueEventsAirplaneMoved,
 			Queue<AtcEventGameStarted> events,
 			Queue<HaoEvent> repaintEvents,
 			Queue<Collection<AtcRoutingNode>> nodesToZone,
+			Queue<HaoEventAirplaneMoved> queuePlanePositionAndNode,
 			Queue<Map<AtcRoutingNode, Rectangle>> nodeZones
 	) {
 		return mapDispatch(
-				mapCache( repaintEvents ),
+				mapCache( pointMapper, repaintEvents ),
+				queueEventsAirplaneMoved,
 				events,
 				nodesToZone,
+				queuePlanePositionAndNode,
 				nodeZones );
 	}
 
 
 	private MapDispatch mapDispatch(
 			MapCache mapCache,
-			Queue<AtcEventGameStarted> events,
+			Queue<AtcEventAirplaneMoved> queueEventsAirplaneMoved,
+			Queue<AtcEventGameStarted> gameStartedEvents,
 			Queue<Collection<AtcRoutingNode>> nodesToZone,
+			Queue<HaoEventAirplaneMoved> queuePlanePositionAndNode,
 			Queue<Map<AtcRoutingNode, Rectangle>> nodeZones
 	) {
 		Class<?> mapDispatchClass = MapDispatch.class;
@@ -858,13 +1019,17 @@ public class Factory
 				mapDispatchClass,
 				new MapDispatch(
 						mapCache,
-						events,
+						queueEventsAirplaneMoved,
+						gameStartedEvents,
 						nodesToZone,
+						queuePlanePositionAndNode,
 						nodeZones ) );
 		return mapDispatch(
 				mapCache,
-				events,
+				queueEventsAirplaneMoved,
+				gameStartedEvents,
 				nodesToZone,
+				queuePlanePositionAndNode,
 				nodeZones );
 	}
 

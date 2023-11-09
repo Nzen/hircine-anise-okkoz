@@ -70,7 +70,7 @@ public class AirplaneCache implements KnowsAirplanes, SavesAirplanes
 		if ( ! maybeAirplane.isPresent() )
 			return;
 		AtcAirplane airplane = maybeAirplane.get();
-		airplane.setFlightPlan( flightPlan );
+		airplane.setApprovedFlightPlan( flightPlan );
 		airplane.setClosestRoutingNode( flightPlan.getRoute().get( 0 ) );
 	}
 

@@ -19,6 +19,17 @@ public class NodeMapper
 {
 
 
+	public List<Node> asAtcFlightPlan(
+			AtcFlightPlan haoFlightPlan
+	) {
+		List<AtcRoutingNode> haoNodesOfFlightPlan = haoFlightPlan.getRoute();
+		List<Node> atcFlightPlanNodes = new ArrayList<>( haoNodesOfFlightPlan.size() );
+		for ( AtcRoutingNode haoNode : haoNodesOfFlightPlan )
+			atcFlightPlanNodes.add( asAtcNode( haoNode ) );
+		return atcFlightPlanNodes;
+	}
+
+
 	public Node asAtcNode(
 			AtcRoutingNode haoNode
 	) {

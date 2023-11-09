@@ -9,7 +9,7 @@ package ws.nzen.game.sim.hao.service;
 public class HaoConstants
 {
 
-	public static int queueDelayMilliseconds = 100;
+	public static int queueDelayMilliseconds = 10;
 
 }
 

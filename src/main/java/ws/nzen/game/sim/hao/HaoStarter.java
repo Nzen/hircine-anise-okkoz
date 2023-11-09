@@ -5,20 +5,13 @@
 package ws.nzen.game.sim.hao;
 
 
-import atc.v1.Event.StreamRequest;
-import atc.v1.Event.StreamResponse;
-
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ws.nzen.game.sim.hao.game.AtcEvent;
-import ws.nzen.game.sim.hao.game.AtcEventAirplaneDetected;
-import ws.nzen.game.sim.hao.game.AtcEventGameStarted;
 import ws.nzen.game.sim.hao.game.AtcEventGameStopped;
 import ws.nzen.game.sim.hao.game.AtcGameVersion;
 import ws.nzen.game.sim.hao.game.HaoEvent;
@@ -33,6 +26,7 @@ import ws.nzen.game.sim.hao.uses.atc.KnowsNodes;
 import ws.nzen.game.sim.hao.uses.atc.LocatesNodes;
 import ws.nzen.game.sim.hao.uses.atc.ManagesGameState;
 import ws.nzen.game.sim.hao.uses.atc.RequestsEvents;
+import ws.nzen.game.sim.hao.uses.atc.VetsFlightPlans;
 import ws.nzen.game.sim.hao.uses.view.BookendsGames;
 import ws.nzen.game.sim.hao.uses.view.ShowsEvents;
 import ws.nzen.game.sim.hao.uses.view.ShowsMap;
@@ -62,6 +56,7 @@ public class HaoStarter
 	private final RequestsEvents eventService;
 	private final ShowsEvents stdOut;
 	private final ShowsMap showsMap;
+	private final VetsFlightPlans flightPlanService;
 
 
 	public HaoStarter(
@@ -91,6 +86,9 @@ public class HaoStarter
 
 		gameService = factory.managesGameState( host, atcPort );
 		threads.execute( gameService );
+
+		flightPlanService = factory.vetsFlightPlans( host, atcPort );
+		threads.execute( flightPlanService );
 
 		eventService = factory.requestsEvents( host, atcPort );
 		threads.execute( eventService );
@@ -124,6 +122,7 @@ public class HaoStarter
 		knowsAirplanes.quit();
 		knowsAtcVersion.quit();
 		eventService.quit();
+		flightPlanService.quit();
 		gameService.quit();
 		knowsMap.quit();
 		knowsNodes.quit();
@@ -131,6 +130,7 @@ public class HaoStarter
 		showsMap.quit();
 		stdOut.quit();
 		threads.shutdownNow();
+		// System.exit( 0 ); // disabled so debugging doesn't quit with game
 	}
 
 
