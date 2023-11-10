@@ -88,6 +88,21 @@ public class MapCache implements SavesMap, KnowsMap
 	}
 
 
+	@Override
+	public Optional<AtcRoutingNode> geNodeOf(
+			AtcMapPoint pointwiseLocation
+	) {
+		for ( AtcRoutingNode node : nodeZones.keySet() )
+		{
+			Rectangle zone = nodeZones.get( node );
+			if ( zone.contains(
+					pointwiseLocation.getXx(), pointwiseLocation.getYy() ) )
+				return Optional.of( node );
+		}
+		return Optional.empty();
+	}
+
+
 	public void save(
 			AtcMap map
 	) {

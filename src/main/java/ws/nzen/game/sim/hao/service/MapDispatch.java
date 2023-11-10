@@ -86,6 +86,14 @@ public class MapDispatch implements KnowsMapRunnably
 
 
 	@Override
+	public Optional<AtcRoutingNode> geNodeOf(
+			AtcMapPoint pointwiseLocation
+	) {
+		return map.geNodeOf( pointwiseLocation );
+	}
+
+
+	@Override
 	public void quit(
 	) {
 		quit = true;
@@ -121,7 +129,7 @@ public class MapDispatch implements KnowsMapRunnably
 					AtcMapPoint currentPosition = airplaneMovedEvent.getPosition();
 					AtcRoutingNode closestNode = map.closestNode( currentPosition );
 					if ( closestNode.getLatitude() == Integer.MIN_VALUE ) {
-						// log.error( "Point "+ currentPosition +" node not zoned yet" );
+						// IMPROVE log.error( "Point "+ currentPosition +" node not zoned yet" );
 						continue;
 					}
 					HaoEventAirplaneMoved updateAirplaneMessage = new HaoEventAirplaneMoved(

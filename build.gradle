@@ -37,7 +37,7 @@ dependencies {
 }
 
 group = 'ws.nzen.game.sim.hao'
-version = '0.0-alpha-5.1'
+version = '0.0-alpha-5.2'
 description = 'Communicates with jndo Auto-Traffic-Control to guide planes'
 
 // ¶ https://github.com/diffplug/spotless/tree/main/plugin-gradle

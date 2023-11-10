@@ -67,10 +67,10 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 			throw new NullPointerException( "gameStartEvents must not be null" );
 		else if ( mapper == null )
 			throw new NullPointerException( "mapper must not be null" );
-		else if ( atcEventsAirplaneDetected == null )
-			throw new NullPointerException( "atcEventsAirplaneDetected must not be null" );
 		else if ( queueEventsAirplaneMoved == null )
 			throw new NullPointerException( "queueEventsAirplaneMoved must not be null" );
+		else if ( atcEventsAirplaneDetected == null )
+			throw new NullPointerException( "atcEventsAirplaneDetected must not be null" );
 		else if ( startStreamRequests == null )
 			throw new NullPointerException( "startStreamRequests must not be null" );
 		else if ( atcEndedGame == null )

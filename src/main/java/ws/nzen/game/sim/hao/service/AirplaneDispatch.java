@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import ws.nzen.game.sim.hao.game.*;
 import ws.nzen.game.sim.hao.uses.atc.KnowsAirplanesRunnably;
+import ws.nzen.game.sim.hao.uses.atc.KnowsMap;
 
 
 /**
@@ -128,7 +129,7 @@ public class AirplaneDispatch implements KnowsAirplanesRunnably
 						airplane.approveProvisionalFlightPlan();
 					}
 					else
-						log.error( "unable to plan "+ airplaneIdentifier( airplane )
+						log.error( "unable to plan "+ airplane.getAtcIdAsSingleCharacter()
 								+" "+ airplane +" because "+ flightPlanResponse.getFlightPlanStatus() );
 								// FIX handle with a different request, somehow
 				}
@@ -169,17 +170,6 @@ public class AirplaneDispatch implements KnowsAirplanesRunnably
 		{
 			log.error( ie.toString() );
 		}
-	}
-
-
-	private String airplaneIdentifier(
-			AtcAirplane airplane
-	) {
-		String withoutTextualPart = airplane.getAtcId().substring( "AT-".length() );
-		int rawId = Integer.parseInt( withoutTextualPart ) %90; // ¶ for visible ascii char range
-		Character baseChar = '\'';
-		Character offsetChar = Character.valueOf( (char)( baseChar.charValue() + rawId ) );
-		return offsetChar.toString();
 	}
 
 
@@ -234,6 +224,14 @@ public class AirplaneDispatch implements KnowsAirplanesRunnably
 		if ( ! maybeAirplane.isPresent() )
 			return;
 		makeNewFlightPlan( maybeAirplane.get() );
+	}
+
+
+	@Override
+	public boolean updateAirplaneNodes(
+			KnowsMap knowsPointsOfNode
+	) {
+		return airplaneCache.updateAirplaneNodes( knowsPointsOfNode );
 	}
 
 

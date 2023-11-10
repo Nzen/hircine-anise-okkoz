@@ -25,4 +25,9 @@ public interface KnowsAirplanes
 			String airplaneId
 	);
 
+
+	public boolean updateAirplaneNodes(
+			KnowsMap knowsPointsOfNode
+	);
+
 }
