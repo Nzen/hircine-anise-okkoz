@@ -141,7 +141,7 @@ public class EventServiceEndpoint implements Runnable, Quittable
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 

@@ -33,6 +33,12 @@ public class MapCache implements SavesMap, KnowsMap
 	private final Queue<HaoEvent> repaintEvents;
 	private Map<AtcRoutingNode, Rectangle> nodeZones = new HashMap<>();
 	private PointMapper pointMapper;
+	/*
+* horizontal node location distance
+* vertical node location distance
+* 'minimal' map location
+* 'maximal' map location
+	 */
 
 
 	public MapCache(
@@ -60,6 +66,7 @@ public class MapCache implements SavesMap, KnowsMap
 			if ( area.contains( pointOnMap ) )
 				return node;
 		}
+
 		return new AtcRoutingNode( Integer.MIN_VALUE, Integer.MIN_VALUE, true );
 	}
 
@@ -95,8 +102,7 @@ public class MapCache implements SavesMap, KnowsMap
 		for ( AtcRoutingNode node : nodeZones.keySet() )
 		{
 			Rectangle zone = nodeZones.get( node );
-			if ( zone.contains(
-					pointwiseLocation.getXx(), pointwiseLocation.getYy() ) )
+			if ( zone.contains( pointwiseLocation.getXx(), pointwiseLocation.getYy() ) )
 				return Optional.of( node );
 		}
 		return Optional.empty();
@@ -117,6 +123,34 @@ public class MapCache implements SavesMap, KnowsMap
 			Map<AtcRoutingNode, Rectangle> zones
 	) {
 		nodeZones.putAll( zones );
+		// estimate distances here by asking for [-8, 11], [  ]
+
+		/*
+		Rectangle mostNegative = new Rectangle();
+		AtcRoutingNode negativeNode = nodeZones.keySet().iterator().next();
+		Rectangle leastNegative = new Rectangle();
+		AtcRoutingNode positiveNode = negativeNode;
+		for ( AtcRoutingNode node : nodeZones.keySet() ) {
+			Rectangle zone = nodeZones.get( node );
+			if ( zone.getMinX() < mostNegative.getMinX() || zone.getMinY() < mostNegative.getMinY() ) {
+				mostNegative = zone;
+				negativeNode = node;
+			}
+
+			if ( zone.getMaxX() > mostNegative.getMaxX() || zone.getMaxY() > mostNegative.getMaxY() ) {
+				leastNegative = zone;
+				positiveNode = node;
+			}
+		}
+		System.out.println( " negative  "+ negativeNode +" area "+ mostNegative );
+		System.out.println( " positive  "+ positiveNode +" area "+ leastNegative );
+		negativeNode = new AtcRoutingNode( -8, -11, false );
+		mostNegative = nodeZones.get( negativeNode );
+		System.out.println( " negative  "+ negativeNode +" area "+ mostNegative );
+		positiveNode = new AtcRoutingNode( 8, 11, false );
+		leastNegative = nodeZones.get( negativeNode );
+		System.out.println( " positive  "+ positiveNode +" area "+ leastNegative );
+		*/
 	}
 
 

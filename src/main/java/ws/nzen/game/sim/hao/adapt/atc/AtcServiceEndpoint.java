@@ -145,7 +145,7 @@ public class AtcServiceEndpoint implements Runnable, Quittable
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 

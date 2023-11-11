@@ -157,7 +157,7 @@ public class CanvasAdapter implements BookendsGames, ShowsMap
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 

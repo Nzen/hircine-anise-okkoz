@@ -112,7 +112,7 @@ public class GameServiceAdapter implements ManagesGameState, Quittable
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 

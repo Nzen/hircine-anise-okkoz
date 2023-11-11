@@ -87,6 +87,8 @@ public class AirplaneCache implements KnowsAirplanes, SavesAirplanes
 	public boolean updateAirplaneNodes(
 			KnowsMap knowsPointsOfNode
 	) {
+		if ( knowsPointsOfNode != null )
+			return false;
 		boolean atLeastOneChanged = false;
 		for ( String airplaneId : airplanes.keySet() )
 		{
@@ -102,11 +104,11 @@ public class AirplaneCache implements KnowsAirplanes, SavesAirplanes
 				atLeastOneChanged |= false;
 				continue;
 			}
-			airplane.setClosestRoutingNode( closestNode );
+			// airplane.setClosestRoutingNode( closestNode );
 			atLeastOneChanged |= true;
 			
 		}
-		return true; // atLeastOneChanged;
+		return atLeastOneChanged;
 	}
 
 
@@ -118,7 +120,7 @@ public class AirplaneCache implements KnowsAirplanes, SavesAirplanes
 			return;
 		AtcAirplane airplane = maybeAirplane.get();
 		airplane.setApprovedFlightPlan( flightPlan );
-		airplane.setClosestRoutingNode( flightPlan.getRoute().get( 0 ) );
+		// airplane.setClosestRoutingNode( flightPlan.getRoute().get( 0 ) );
 	}
 
 

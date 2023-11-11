@@ -168,7 +168,7 @@ public class AirplaneDispatch implements KnowsAirplanesRunnably
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 
@@ -186,13 +186,13 @@ public class AirplaneDispatch implements KnowsAirplanesRunnably
 		AtcMapPoint currentPosition = airplane.getLocation();
 		final int alpha = 0, bravo = alpha +1, charlie = bravo +1, delta = charlie +1;
 		int arrived;
-		if ( currentPosition.getXx() < -350 )
+		if ( currentPosition.getXx() > 350 )
 			arrived = alpha;
-		else if ( currentPosition.getXx() > 350 )
+		else if ( currentPosition.getXx() < -350 )
 			arrived = bravo;
-		else if ( currentPosition.getYy() < -350 )
+		else if ( currentPosition.getYy() > 350 )
 			arrived = delta;
-		else // if ( currentPosition.getYy() > 350 )
+		else // if ( currentPosition.getYy() < -350 )
 			arrived = charlie;
 		for ( int index = 1; index < 6; index += 1 ) {
 			AtcRoutingNode nextNode;

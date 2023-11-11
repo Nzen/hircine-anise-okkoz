@@ -78,8 +78,8 @@ public class AtcRoutingNode
 	@Override
 	public String toString(
 	) {
-		return "MapNode [" + latitude + ", "
-				+ longitude + (restricted ? " impassible" : "") + "]";
+		return "MapNode ["+ longitude +", "+ latitude
+				+ (restricted ? " impassible" : "") + "]";
 	}
 
 }

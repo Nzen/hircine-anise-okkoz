@@ -132,7 +132,7 @@ public class AtcAirplane
 		if ( atcId.isEmpty() )
 			return " ";
 		String withoutTextualPart = getAtcId().substring( "AT-".length() );
-		int rawId = Integer.parseInt( withoutTextualPart ) %90; // ¶ for visible ascii char range
+		int rawId = Integer.parseInt( withoutTextualPart ) %89; // ¶ for visible ascii char range
 		Character baseChar = '\'';
 		Character offsetChar = Character.valueOf( (char)( baseChar.charValue() + rawId ) );
 		return offsetChar.toString();

@@ -88,6 +88,8 @@ public class ZonesMap implements LocatesNodes
 				while ( ! nodesToZone.isEmpty() )
 				{
 					nodes = nodesToZone.poll();
+					for ( AtcRoutingNode node : nodes )
+						nodeToPointRequests.offer( node );
 					chooseExemplarNodes();
 					nodeToPointRequests.offer( exemplarNodes.origin.getRoutingNode() );
 					nodeToPointRequests.offer( exemplarNodes.downward.getRoutingNode() );
@@ -108,9 +110,7 @@ public class ZonesMap implements LocatesNodes
 					if ( exemplarNodes.origin.getPoint().getXx() != fakePoint.getXx()
 							&& exemplarNodes.downward.getPoint().getXx() != fakePoint.getXx()
 							&& exemplarNodes.rightward.getPoint().getXx() != fakePoint.getXx() )
-					{
 						nodeZones.offer( estimateZonesFromTriangle() );
-					}
 				}
 
 				if ( quit )
@@ -120,37 +120,53 @@ public class ZonesMap implements LocatesNodes
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 
 
 	private void chooseExemplarNodes(
 	) {
+		/*
 		AtcRoutingNode topLeft = new AtcRoutingNode(
 				Integer.MAX_VALUE, Integer.MIN_VALUE, true );
-		for ( AtcRoutingNode node : nodes )
+		for ( AtcRoutingNode node : nodes ) {
 			if ( ( node.getLatitude() <= topLeft.getLatitude()
 						&& node.getLongitude() > topLeft.getLongitude() )
 					|| ( node.getLatitude() < topLeft.getLatitude()
 						&& node.getLongitude() >= topLeft.getLongitude() ) )
 				topLeft = node;
+		}
 		AtcRoutingNode nextRight = new AtcRoutingNode(
-				topLeft.getLatitude() +1, topLeft.getLongitude(), false );
+				topLeft.getLatitude(), topLeft.getLongitude() +1, false );
 		AtcRoutingNode nextDown = new AtcRoutingNode(
-				topLeft.getLatitude(), topLeft.getLongitude() -1, false );
+				topLeft.getLatitude() -1, topLeft.getLongitude(), false );
 		exemplarNodes.origin = new AtcNodePoint( fakePoint, topLeft );
 		exemplarNodes.downward = new AtcNodePoint( fakePoint, nextDown );
 		exemplarNodes.rightward = new AtcNodePoint( fakePoint, nextRight );
+		*/
+		int leastLongitudeCoordinate = -11;
+		int greatestLatitudeCoordinate = 8;
+		for ( AtcRoutingNode node : nodes ) {
+			if ( node.getLongitude() == leastLongitudeCoordinate
+					&& node.getLatitude() == greatestLatitudeCoordinate )
+				exemplarNodes.origin = new AtcNodePoint( fakePoint, node );
+			else if ( node.getLongitude() == leastLongitudeCoordinate
+					&& node.getLatitude() == greatestLatitudeCoordinate -1 )
+				exemplarNodes.downward = new AtcNodePoint( fakePoint, node );
+			else if ( node.getLongitude() == leastLongitudeCoordinate +1
+					&& node.getLatitude() == greatestLatitudeCoordinate )
+				exemplarNodes.rightward = new AtcNodePoint( fakePoint, node );
+		}
 	}
 
 
 	private Map<AtcRoutingNode, Rectangle> estimateZonesFromTriangle(
 	) {
-		int pointHeightBetweenNodes = exemplarNodes.origin.getPoint().getYy()
-				- exemplarNodes.downward.getPoint().getYy();
-		int pointWidthBetweenNodes = exemplarNodes.rightward.getPoint().getXx()
-				- exemplarNodes.origin.getPoint().getXx();
+		int pointHeightBetweenNodes = 32 /*exemplarNodes.origin.getPoint().getXx()
+				- exemplarNodes.rightward.getPoint().getXx() */;
+		int pointWidthBetweenNodes = 32 /*exemplarNodes.rightward.getPoint().getYy()
+				- exemplarNodes.origin.getPoint().getYy() */;
 		int halfOfHeight = (int)Math.round( pointHeightBetweenNodes / 2D );
 		int halfOfWidth = (int)Math.round( pointWidthBetweenNodes / 2D );
 		AtcRoutingNode originNode = exemplarNodes.origin.getRoutingNode();
@@ -159,20 +175,18 @@ public class ZonesMap implements LocatesNodes
 				exemplarNodes.origin.getPoint().getYy() + halfOfHeight,
 				pointWidthBetweenNodes,
 				pointHeightBetweenNodes );
-		Point pixelTopLeft = originZone.getLocation();
-		Point pixelBottomLeft = new Point(
-				pixelTopLeft.x,
-				pixelTopLeft.y - pointHeightBetweenNodes );
 		Map<AtcRoutingNode, Rectangle> zones = new HashMap<>( nodes.size() );
 		for ( AtcRoutingNode node : nodes )
 		{
 			Rectangle nodeZone = new Rectangle(
-					pointWidthBetweenNodes, pointHeightBetweenNodes );
-			nodeZone.setLocation(
-					( node.getLatitude() - originNode.getLatitude() )
-							* pointWidthBetweenNodes + pixelBottomLeft.x,
 					( node.getLongitude() - originNode.getLongitude() )
-							* pointHeightBetweenNodes + pixelBottomLeft.y );
+							* pointWidthBetweenNodes
+							+ originZone.x,
+					( node.getLatitude() - originNode.getLatitude() )
+							* pointHeightBetweenNodes
+							+ originZone.y,
+					pointWidthBetweenNodes,
+					pointHeightBetweenNodes );
 			zones.put( node, nodeZone );
 		}
 		return zones;

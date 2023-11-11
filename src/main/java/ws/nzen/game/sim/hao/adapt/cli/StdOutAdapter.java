@@ -86,7 +86,7 @@ else if ( blob instanceof ws.nzen.game.sim.hao.game.AtcEventAirplaneMoved )
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 

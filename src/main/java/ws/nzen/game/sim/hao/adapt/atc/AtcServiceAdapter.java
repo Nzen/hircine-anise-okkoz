@@ -110,7 +110,7 @@ public class AtcServiceAdapter implements KnowsAtcVersion
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 

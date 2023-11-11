@@ -145,7 +145,7 @@ public class EventServiceAdapter implements RequestsEvents, Runnable, Quittable
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 

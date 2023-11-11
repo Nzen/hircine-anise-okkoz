@@ -130,7 +130,7 @@ public class HaoStarter
 		showsMap.quit();
 		stdOut.quit();
 		threads.shutdownNow();
-		// System.exit( 0 ); // disabled so debugging doesn't quit with game
+		//System.exit( 0 ); // disable to continue debugging after game ends
 	}
 
 
@@ -146,7 +146,7 @@ public class HaoStarter
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 
@@ -263,7 +263,7 @@ public class HaoStarter
 			}
 			catch ( InterruptedException ie )
 			{
-				log.error( ie.toString() );
+				return;
 			}
 		}
 

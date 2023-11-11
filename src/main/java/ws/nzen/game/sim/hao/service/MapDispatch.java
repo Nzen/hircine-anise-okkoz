@@ -145,7 +145,7 @@ public class MapDispatch implements KnowsMapRunnably
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 

@@ -128,7 +128,7 @@ public class MapServiceAdapter implements KnowsNodes
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 

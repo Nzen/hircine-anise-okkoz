@@ -107,7 +107,7 @@ public class AirplaneServiceAdapter implements VetsFlightPlans
 		}
 		catch ( InterruptedException ie )
 		{
-			log.error( ie.toString() );
+			return;
 		}
 	}
 
